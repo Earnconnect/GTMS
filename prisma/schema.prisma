@@ -1,0 +1,739 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  WORKER
+  BUSINESS
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+  PENDING_KYC
+  DORMANT
+}
+
+enum KycStatus {
+  UNSUBMITTED
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum MembershipTier {
+  BASIC
+  PROFESSIONAL
+  EXECUTIVE
+}
+
+enum MembershipStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+}
+
+enum CareerLevel {
+  DIGITAL_ASSOCIATE
+  CERTIFIED_REVIEWER
+  SENIOR_VERIFIER
+  VERIFICATION_SPECIALIST
+  TEAM_SUPERVISOR
+}
+
+enum CertificationSlug {
+  PRODUCT_REVIEW
+  COMMERCE_OPS
+  VERIFICATION
+  AI_EVALUATION
+}
+
+enum WorkerCertStatus {
+  IN_PROGRESS
+  PASSED
+  FAILED
+  EXPIRED
+}
+
+enum TaskCategory {
+  PRODUCT_INTELLIGENCE
+  ORDER_OPERATIONS
+  TRANSACTION_VERIFICATION
+  AI_DATA_INTELLIGENCE
+  COMBINATION
+}
+
+enum TaskStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum AssignmentStatus {
+  AVAILABLE
+  RESERVED
+  SUBMITTED
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  AUTO_APPROVED
+}
+
+enum QaStage {
+  WORKER
+  PEER_REVIEW
+  SENIOR_VERIFICATION
+  AI_AUDIT
+  FINAL_APPROVAL
+}
+
+enum QaStageStatus {
+  PENDING
+  PASSED
+  FAILED
+  SKIPPED
+}
+
+enum TxnType {
+  DEPOSIT
+  EARNING
+  PAYOUT
+  PLATFORM_FEE
+  REFUND
+  MEMBERSHIP_FEE
+  REFERRAL_BONUS
+  ADMIN_CREDIT
+  LOAN
+  MILESTONE_BONUS
+  GTMS_PASS_FEE
+  WELCOME_BONUS
+}
+
+enum TxnStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum PayoutStatus {
+  REQUESTED
+  PROCESSING
+  COMPLETED
+  CANCELLED
+  FAILED
+}
+
+enum DepositStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum DeviceStatus {
+  TRUSTED
+  SUSPICIOUS
+  BLOCKED
+}
+
+enum FraudSeverity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum PayoutSchedule {
+  WEEKLY
+  BIWEEKLY
+  INSTANT
+}
+
+enum DisputeStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum NotificationType {
+  TASK_APPROVED
+  TASK_REJECTED
+  PAYOUT_PROCESSED
+  PAYOUT_REJECTED
+  DEPOSIT_APPROVED
+  DEPOSIT_REJECTED
+  KYC_APPROVED
+  KYC_REJECTED
+  MEMBERSHIP_ACTIVATED
+  MEMBERSHIP_CANCELLED
+  CERTIFICATION_EARNED
+  CERTIFICATION_EXPIRING
+  LEVEL_UP
+  FRAUD_FLAG
+  DISPUTE_UPDATE
+  SUPPORT_REPLY
+  REFERRAL_BONUS
+  MILESTONE_BONUS
+  GTMS_PASS_ACTIVATED
+  ACCOUNT_DORMANT
+  ACCOUNT_REACTIVATED
+  WELCOME_BONUS
+  COMBINATION_INTRO
+}
+
+enum MfaChallengeType {
+  TOTP
+  EMAIL
+}
+
+enum LeaderboardPeriod {
+  WEEKLY
+  MONTHLY
+  ALL_TIME
+}
+
+// ─── Auth Models ──────────────────────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Core User ────────────────────────────────────────────────────────────────
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  passwordHash  String?
+  role          Role       @default(WORKER)
+  status        UserStatus @default(ACTIVE)
+  country       String?
+  bio           String?
+
+  careerLevel      CareerLevel @default(DIGITAL_ASSOCIATE)
+  accuracyScore    Float       @default(50)
+  speedScore       Float       @default(50)
+  consistencyScore Float       @default(50)
+  trustScore       Float       @default(50)
+  totalEarnedCents Int         @default(0)
+
+  mfaEnabled Boolean @default(false)
+  mfaSecret  String?
+
+  gtmsPassActive         Boolean   @default(false)
+  gtmsPassPurchasedAt    DateTime?
+  gtmsPassDiscountPct    Int       @default(0)
+  dormantSince           DateTime?
+  dormantActivationCents Int       @default(0)
+  welcomeBonusClaimed    Boolean   @default(false)
+  firstMilestoneClaimed  Boolean   @default(false)
+
+  kycStatus KycStatus @default(UNSUBMITTED)
+
+  referralCode String?  @unique
+  referredById String?
+  referredBy   User?    @relation("UserReferrals", fields: [referredById], references: [id])
+  referrals    User[]   @relation("UserReferrals")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts         Account[]
+  sessions         Session[]
+  membership       Membership?
+  wallet           WalletAccount?
+  tasksCreated     Task[]                @relation("TaskRequester")
+  assignments      Assignment[]
+  workerSubs       Submission[]          @relation("WorkerSubmissions")
+  reviewerSubs     Submission[]          @relation("ReviewerSubmissions")
+  certifications   WorkerCertification[]
+  notifications    Notification[]
+  devices          DeviceSession[]
+  fraudFlags       FraudFlag[]
+  kycSubmissions   KycSubmission[]
+  deposits         Deposit[]
+  payouts          Payout[]
+  openedDisputes   Dispute[]        @relation("DisputeOpener")
+  resolvedDisputes Dispute[]        @relation("DisputeResolver")
+  disputeMessages  DisputeMessage[] @relation("DisputeMessageAuthor")
+  ticketMessages   TicketMessage[]  @relation("TicketMessageAuthor")
+  mfaChallenges    MfaChallenge[]
+  auditLogsActed   AuditLog[]
+  supportTickets   SupportTicket[]
+  referralsMade    Referral[]            @relation("ReferrerReferrals")
+  referralReceived Referral?             @relation("RefereeReferral")
+}
+
+// ─── Membership ───────────────────────────────────────────────────────────────
+
+model Membership {
+  id                 String           @id @default(cuid())
+  userId             String           @unique
+  tier               MembershipTier
+  status             MembershipStatus @default(ACTIVE)
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean          @default(false)
+  activatedById      String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Certifications ───────────────────────────────────────────────────────────
+
+model Certification {
+  id                    String            @id @default(cuid())
+  slug                  CertificationSlug @unique
+  title                 String
+  description           String
+  requiredAccuracyScore Float             @default(0)
+  examQuestions         Json
+  passingScore          Int               @default(70)
+  validityDays          Int               @default(365)
+  createdAt             DateTime          @default(now())
+
+  workerCerts WorkerCertification[]
+}
+
+model WorkerCertification {
+  id              String           @id @default(cuid())
+  workerId        String
+  certificationId String
+  status          WorkerCertStatus @default(IN_PROGRESS)
+  score           Int?
+  earnedAt        DateTime?
+  expiresAt       DateTime?
+  createdAt       DateTime         @default(now())
+
+  worker        User          @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  certification Certification @relation(fields: [certificationId], references: [id])
+
+  @@unique([workerId, certificationId])
+}
+
+// ─── Tasks ────────────────────────────────────────────────────────────────────
+
+model Task {
+  id                     String         @id @default(cuid())
+  requesterId            String
+  title                  String
+  description            String
+  instructions           String
+  category               TaskCategory
+  fieldSchema            Json
+  rewardPerUnitCents     Int
+  totalUnits             Int
+  maxPerWorker           Int            @default(1)
+  reviewWindowH          Int            @default(48)
+  reservationTtlM        Int            @default(60)
+  status                 TaskStatus     @default(DRAFT)
+  requiredCertifications String[]
+  requiredCareerLevel    CareerLevel    @default(DIGITAL_ASSOCIATE)
+  requiredMembershipTier MembershipTier @default(BASIC)
+  minAccuracyScore       Float          @default(0)
+  qaEnabled              Boolean        @default(false)
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  requester   User         @relation("TaskRequester", fields: [requesterId], references: [id])
+  assignments Assignment[]
+  disputes    Dispute[]
+}
+
+model Assignment {
+  id         String           @id @default(cuid())
+  taskId     String
+  unitIndex  Int
+  inputData  Json?
+  status     AssignmentStatus @default(AVAILABLE)
+  workerId   String?
+  reservedAt DateTime?
+  expiresAt  DateTime?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  task       Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  worker     User?       @relation(fields: [workerId], references: [id])
+  submission Submission?
+
+  @@index([taskId, status])
+  @@index([workerId, status])
+  @@index([expiresAt])
+}
+
+model Submission {
+  id            String           @id @default(cuid())
+  assignmentId  String           @unique
+  workerId      String
+  data          Json
+  status        SubmissionStatus @default(PENDING)
+  reviewedById  String?
+  reviewedAt    DateTime?
+  rejectReason  String?
+  autoApproveAt DateTime?
+  earningTxnId  String?          @unique
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  assignment Assignment      @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  worker     User            @relation("WorkerSubmissions", fields: [workerId], references: [id])
+  reviewer   User?           @relation("ReviewerSubmissions", fields: [reviewedById], references: [id])
+  qaStages   QaStageReview[]
+  disputes   Dispute[]
+
+  @@index([workerId, status])
+  @@index([autoApproveAt])
+}
+
+model QaStageReview {
+  id           String        @id @default(cuid())
+  submissionId String
+  stage        QaStage
+  status       QaStageStatus @default(PENDING)
+  reviewerId   String?
+  notes        String?
+  completedAt  DateTime?
+  createdAt    DateTime      @default(now())
+
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@unique([submissionId, stage])
+  @@index([submissionId])
+}
+
+// ─── Wallet & Financials ──────────────────────────────────────────────────────
+
+model WalletAccount {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  balanceCents Int      @default(0)
+  escrowCents  Int      @default(0)
+  currency     String   @default("USD")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+}
+
+model Transaction {
+  id           String    @id @default(cuid())
+  walletId     String
+  type         TxnType
+  amountCents  Int
+  status       TxnStatus @default(COMPLETED)
+  description  String
+  metadata     Json?
+  relatedTxnId String?
+  createdAt    DateTime  @default(now())
+
+  wallet WalletAccount @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId, createdAt])
+  @@index([type, createdAt])
+}
+
+model Deposit {
+  id            String        @id @default(cuid())
+  userId        String
+  amountCents   Int
+  status        DepositStatus @default(PENDING)
+  proofUrl      String?
+  paymentMethod String?
+  adminNote     String?
+  reviewedById  String?
+  reviewedAt    DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([status, createdAt])
+}
+
+model Payout {
+  id            String         @id @default(cuid())
+  userId        String
+  amountCents   Int
+  status        PayoutStatus   @default(REQUESTED)
+  scheduleType  PayoutSchedule @default(WEEKLY)
+  method        String
+  details       Json
+  adminNote     String?
+  processedById String?
+  processedAt   DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([status, createdAt])
+}
+
+// ─── KYC ──────────────────────────────────────────────────────────────────────
+
+model KycSubmission {
+  id           String    @id @default(cuid())
+  userId       String
+  docType      String
+  docNumber    String
+  docFrontUrl  String
+  docBackUrl   String?
+  selfieUrl    String?
+  status       KycStatus @default(PENDING)
+  adminNote    String?
+  reviewedById String?
+  reviewedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status, createdAt])
+}
+
+// ─── Security ─────────────────────────────────────────────────────────────────
+
+model MfaChallenge {
+  id        String           @id @default(cuid())
+  userId    String
+  codeHash  String
+  type      MfaChallengeType @default(TOTP)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model DeviceSession {
+  id          String       @id @default(cuid())
+  userId      String
+  fingerprint String
+  ipAddress   String
+  userAgent   String?
+  status      DeviceStatus @default(TRUSTED)
+  lastSeenAt  DateTime     @default(now())
+  createdAt   DateTime     @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, fingerprint])
+  @@index([userId, lastSeenAt])
+}
+
+model FraudFlag {
+  id           String        @id @default(cuid())
+  userId       String
+  flagType     String
+  severity     FraudSeverity @default(LOW)
+  metadata     Json?
+  resolvedAt   DateTime?
+  resolvedById String?
+  createdAt    DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, resolvedAt])
+  @@index([severity, createdAt])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  actorRole  Role
+  action     String
+  targetType String?
+  targetId   String?
+  metadata   Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  actor User @relation(fields: [actorId], references: [id])
+
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+  @@index([targetType, targetId])
+}
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+}
+
+// ─── Disputes ─────────────────────────────────────────────────────────────────
+
+model Dispute {
+  id           String        @id @default(cuid())
+  openedById   String
+  taskId       String?
+  submissionId String?
+  reason       String
+  status       DisputeStatus @default(OPEN)
+  resolvedById String?
+  resolvedAt   DateTime?
+  resolution   String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  openedBy   User             @relation("DisputeOpener", fields: [openedById], references: [id])
+  task       Task?            @relation(fields: [taskId], references: [id])
+  submission Submission?      @relation(fields: [submissionId], references: [id])
+  resolvedBy User?            @relation("DisputeResolver", fields: [resolvedById], references: [id])
+  messages   DisputeMessage[]
+
+  @@index([openedById, status])
+  @@index([status, createdAt])
+}
+
+model DisputeMessage {
+  id        String   @id @default(cuid())
+  disputeId String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  dispute Dispute @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  author  User    @relation("DisputeMessageAuthor", fields: [authorId], references: [id])
+
+  @@index([disputeId, createdAt])
+}
+
+// ─── Support ──────────────────────────────────────────────────────────────────
+
+model SupportTicket {
+  id        String       @id @default(cuid())
+  userId    String
+  subject   String
+  status    TicketStatus @default(OPEN)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages TicketMessage[]
+
+  @@index([userId, status])
+  @@index([status, createdAt])
+}
+
+model TicketMessage {
+  id        String   @id @default(cuid())
+  ticketId  String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author User          @relation("TicketMessageAuthor", fields: [authorId], references: [id])
+
+  @@index([ticketId, createdAt])
+}
+
+// ─── Referrals ────────────────────────────────────────────────────────────────
+
+model Referral {
+  id           String   @id @default(cuid())
+  referrerId   String
+  refereeId    String   @unique
+  bonusAwarded Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  referrer User @relation("ReferrerReferrals", fields: [referrerId], references: [id])
+  referee  User @relation("RefereeReferral", fields: [refereeId], references: [id])
+
+  @@index([referrerId])
+}
+
+// ─── Leaderboard ──────────────────────────────────────────────────────────────
+
+model LeaderboardSnapshot {
+  id             String            @id @default(cuid())
+  period         LeaderboardPeriod
+  workerId       String
+  rank           Int
+  earningsCents  Int
+  accuracyScore  Float
+  tasksCompleted Int
+  snapshotDate   DateTime
+
+  @@unique([period, workerId, snapshotDate])
+  @@index([period, rank, snapshotDate])
+}

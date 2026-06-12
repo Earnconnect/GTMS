@@ -1,0 +1,20 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/expire-reservations",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/auto-approve",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/leaderboard-snapshot",
+      "schedule": "0 0 * * 0"
+    },
+    {
+      "path": "/api/cron/cert-expiry-check",
+      "schedule": "0 2 * * *"
+    }
+  ]
+}
