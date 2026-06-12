@@ -37,6 +37,9 @@
     "uploadthing": "^7.7.4",
     "zod": "^4.4.3"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
