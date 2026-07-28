@@ -1,9 +1,10 @@
-import { Wallet as WalletIcon, TrendingUp, BadgeCheck, CheckCircle2 } from "lucide-react";
+import { Wallet as WalletIcon, TrendingUp, BadgeCheck, CheckCircle2, Landmark } from "lucide-react";
 import { requireRole } from "@/server/rbac";
 import { db } from "@/server/db";
 import { getOrCreateWallet } from "@/server/services/wallet.service";
 import { PageHeader, StatCard, SectionCard } from "@/components/ui";
 import { PayoutForm } from "@/components/wallet/PayoutForm";
+import { WithdrawalMethodForm } from "@/components/wallet/WithdrawalMethodForm";
 import { StripeConnectButton } from "@/components/wallet/StripeConnectButton";
 import { TxnTable } from "@/components/wallet/TxnTable";
 import { StatusBadge } from "@/components/tasks/StatusBadge";
@@ -26,6 +27,7 @@ export default async function WorkerWalletPage({
   });
   const kycApproved = me?.kycStatus === "APPROVED";
   const stripeConnected = Boolean(me?.stripeConnectId);
+  const method = await db.withdrawalMethod.findUnique({ where: { userId: user.id } });
 
   const [txns, payouts, lifetime] = await Promise.all([
     db.transaction.findMany({
@@ -89,7 +91,38 @@ export default async function WorkerWalletPage({
         </SectionCard>
       )}
 
+      <SectionCard
+        title="Withdrawal details"
+        description="Where your payouts are sent."
+        action={
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-50 text-brand-700">
+            <Landmark className="h-4 w-4" />
+          </span>
+        }
+      >
+        <WithdrawalMethodForm
+          method={
+            method
+              ? {
+                  type: method.type,
+                  accountName: method.accountName,
+                  institution: method.institution,
+                  accountLast4: method.accountLast4,
+                  currency: method.currency,
+                  country: method.country,
+                }
+              : null
+          }
+        />
+      </SectionCard>
+
       <SectionCard title="Withdraw" description="Request a payout from your available balance.">
+        {!method && (
+          <div className="mb-4 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            <Landmark className="h-4 w-4 shrink-0" />
+            Add your withdrawal details above before requesting a payout.
+          </div>
+        )}
         <PayoutForm balance={wallet.balance} minPayout={MIN_PAYOUT_CENTS} />
       </SectionCard>
 

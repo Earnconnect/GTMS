@@ -9,6 +9,8 @@ import {
   getOnboardingProgress,
 } from "@/server/services/onboarding.service";
 import { DocumentRow, RetirementForm } from "@/components/onboarding/OnboardingClient";
+import { WithdrawalMethodForm } from "@/components/wallet/WithdrawalMethodForm";
+import { Landmark } from "lucide-react";
 
 export default async function OnboardingPage() {
   const user = await requireRole("WORKER");
@@ -19,9 +21,10 @@ export default async function OnboardingPage() {
     ensureRetirementPlan(user.id),
   ]);
 
-  const [progress, plan] = await Promise.all([
+  const [progress, plan, method] = await Promise.all([
     getOnboardingProgress(user.id),
     db.retirementPlan.findUnique({ where: { userId: user.id } }),
+    db.withdrawalMethod.findUnique({ where: { userId: user.id } }),
   ]);
 
   return (
@@ -95,6 +98,32 @@ export default async function OnboardingPage() {
           </div>
         </div>
       </div>
+
+      {/* Withdrawal details */}
+      <SectionCard
+        title="Withdrawal details"
+        description="Where your salary is paid out when you withdraw."
+        action={
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-50 text-brand-700">
+            <Landmark className="h-4 w-4" />
+          </span>
+        }
+      >
+        <WithdrawalMethodForm
+          method={
+            method
+              ? {
+                  type: method.type,
+                  accountName: method.accountName,
+                  institution: method.institution,
+                  accountLast4: method.accountLast4,
+                  currency: method.currency,
+                  country: method.country,
+                }
+              : null
+          }
+        />
+      </SectionCard>
 
       <div className="flex justify-end">
         <ButtonLink href="/jobs" variant="secondary" className="gap-2">

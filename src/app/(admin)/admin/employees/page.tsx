@@ -19,7 +19,7 @@ export default async function AdminEmployeesPage() {
   const employees = await db.user.findMany({
     where: { employmentStatus: { not: null } },
     orderBy: { hiredAt: "desc" },
-    include: { wallet: true },
+    include: { wallet: true, withdrawalMethod: true },
     take: 500,
   });
 
@@ -71,6 +71,11 @@ export default async function AdminEmployeesPage() {
                 <td className="px-5 py-3 text-slate-600">
                   <div className="font-medium text-slate-700">{e.jobTitle ?? "—"}</div>
                   <div className="text-xs text-slate-400">{e.department ?? ""}</div>
+                  <div className="mt-0.5 text-xs text-slate-400">
+                    {e.withdrawalMethod
+                      ? `Payout ···· ${e.withdrawalMethod.accountLast4}`
+                      : "No payout method"}
+                  </div>
                 </td>
                 <td className="px-5 py-3">
                   <Badge tone={STATUS_TONE[e.employmentStatus ?? "ONBOARDING"]}>

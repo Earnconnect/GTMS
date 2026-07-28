@@ -190,9 +190,10 @@ model User {
   jobPostings     JobPosting[]        @relation("JobPoster")
   applications    JobApplication[]    @relation("Applicant")
   enrollments     TrainingEnrollment[]
-  jobReports      JobReport[]
-  documents       OnboardingDocument[]
-  retirementPlan  RetirementPlan?
+  jobReports       JobReport[]
+  documents        OnboardingDocument[]
+  retirementPlan   RetirementPlan?
+  withdrawalMethod WithdrawalMethod?
 
   // Stripe Connect account ID (workers only — used as payout destination)
   stripeConnectId String?
@@ -739,6 +740,32 @@ model OnboardingDocument {
 
   @@unique([userId, docType])
   @@index([userId])
+}
+
+// ---- Withdrawal / payout method ----
+// Money flows company -> employee only; this is the employee's destination for
+// their OWN withdrawals. Only masked details are stored (last 4), never the
+// full account number.
+
+enum PayoutMethodType {
+  BANK
+  PAYPAL
+  MOBILE_MONEY
+  CARD
+}
+
+model WithdrawalMethod {
+  id           String           @id @default(cuid())
+  userId       String           @unique
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type         PayoutMethodType @default(BANK)
+  accountName  String
+  institution  String?
+  accountLast4 String
+  country      String?
+  currency     String           @default("USD")
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
 }
 
 // ---- 401(k) retirement benefit (simulated — no real accounts) ----

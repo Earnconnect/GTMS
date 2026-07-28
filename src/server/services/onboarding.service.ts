@@ -38,11 +38,12 @@ export async function ensureRetirementPlan(userId: string) {
  * a training enrollment, 401(k) decision made, and profile onboarded.
  */
 export async function getOnboardingProgress(userId: string) {
-  const [docs, enrollments, plan, user] = await Promise.all([
+  const [docs, enrollments, plan, user, method] = await Promise.all([
     db.onboardingDocument.findMany({ where: { userId } }),
     db.trainingEnrollment.count({ where: { userId } }),
     db.retirementPlan.findUnique({ where: { userId } }),
-    db.user.findUnique({ where: { id: userId }, select: { employmentStatus: true } }),
+    db.user.findUnique({ where: { id: userId }, select: { employmentStatus: true, kycStatus: true } }),
+    db.withdrawalMethod.findUnique({ where: { userId } }),
   ]);
 
   const requiredDocs = docs.filter((d) => d.required);
@@ -52,11 +53,13 @@ export async function getOnboardingProgress(userId: string) {
   const steps = [
     { key: "profile", label: "Employment activated", done: user?.employmentStatus === "EMPLOYED" },
     { key: "documents", label: "Documents verified", done: docsDone },
+    { key: "verification", label: "Identity verified", done: user?.kycStatus === "APPROVED" },
     { key: "training", label: "Enrolled in training", done: enrollments > 0 },
     { key: "benefits", label: "401(k) decision made", done: Boolean(plan?.enrolled || (plan && plan.contributionPct === 0 && plan.updatedAt > plan.createdAt)) },
+    { key: "payout", label: "Withdrawal details added", done: Boolean(method) },
   ];
   const completed = steps.filter((s) => s.done).length;
   const pct = Math.round((completed / steps.length) * 100);
 
-  return { steps, completed, total: steps.length, pct, docs, verifiedRequired, requiredDocs: requiredDocs.length };
+  return { steps, completed, total: steps.length, pct, docs, verifiedRequired, requiredDocs: requiredDocs.length, hasMethod: Boolean(method) };
 }

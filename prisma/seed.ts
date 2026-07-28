@@ -219,6 +219,20 @@ async function main() {
       data: { userId: employee.id, enrolled: true, contributionPct: 6, employerMatchPct: 4, balanceCents: 1250_00 },
     });
   }
+  const hasMethod = await db.withdrawalMethod.findUnique({ where: { userId: employee.id } });
+  if (!hasMethod) {
+    await db.withdrawalMethod.create({
+      data: {
+        userId: employee.id,
+        type: "BANK",
+        accountName: "Wanda Employee",
+        institution: "First National Bank",
+        accountLast4: "4291",
+        country: "United States",
+        currency: "USD",
+      },
+    });
+  }
 
   console.log("Seeded HR demo content: courses, job placements, onboarding docs.");
   console.log("Seeded users:");

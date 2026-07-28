@@ -72,18 +72,19 @@ export default function LandingPage() {
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-3 py-1 text-xs font-semibold text-brand-700 shadow-sm">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              The all-in-one workforce platform
+              We&apos;re hiring — start your application today
             </span>
             <h1 className="mt-6 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-              Hire, onboard, train, and{" "}
+              A career that pays you{" "}
               <span className="bg-gradient-to-r from-brand-600 to-emerald-500 bg-clip-text text-transparent">
-                pay your team
+                what you&apos;re worth
               </span>
             </h1>
             <p className="mt-5 max-w-xl text-lg text-slate-600">
-              GTMS brings recruiting, onboarding, learning, and payroll into one
-              professional workspace. Apply, get onboarded by our team, complete your
-              training, and receive your salary in your wallet — withdraw any time.
+              Join GTMS and we&apos;ll take you from application to first paycheck —
+              guided onboarding, paid training, real placements, and a salary sent
+              straight to your wallet. Set your withdrawal details once and cash out
+              whenever you like. Joining is always free.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <ButtonLink href="/register" size="lg" className="gap-2">
@@ -174,7 +175,7 @@ export default function LandingPage() {
               icon: ArrowDownToLine,
               step: "03",
               title: "Get paid",
-              body: "Salary lands in your wallet. Verify your identity once, then withdraw whenever you like.",
+              body: "Salary lands in your wallet. Add your withdrawal details once, verify your identity, and cash out whenever you like.",
             },
           ].map((f) => (
             <div
@@ -198,11 +199,11 @@ export default function LandingPage() {
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-slate-900">
-            Everything a real team needs
+            Everything you need, from day one
           </h2>
           <p className="mt-3 text-slate-600">
-            From the first application to payday — recruiting, onboarding, training,
-            benefits, and payroll in one professional platform.
+            One professional platform for your whole journey — applications,
+            interviews, onboarding, training, benefits, and getting paid.
           </p>
         </div>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

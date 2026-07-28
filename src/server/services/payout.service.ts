@@ -28,6 +28,14 @@ export async function requestPayout(userId: string, amountCents: number) {
     }
   }
 
+  // A payout destination must be on file before any withdrawal.
+  const method = await db.withdrawalMethod.findUnique({ where: { userId } });
+  if (!method) {
+    throw new WalletError(
+      "Add your withdrawal details before requesting a payout.",
+    );
+  }
+
   return db.$transaction(async (tx) => {
     const wallet = await tx.walletAccount.findUnique({ where: { userId } });
     if (!wallet) throw new WalletError("Wallet not found");
