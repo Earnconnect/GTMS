@@ -1,0 +1,496 @@
+// GTMS — Legitimate micro-task marketplace
+// Money flows ONE direction only: requester -> escrow -> worker.
+// Workers never deposit. See guardrails in the plan + wallet.service.ts.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------- Enums -----------------------------
+
+enum Role {
+  WORKER
+  REQUESTER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum TaskStatus {
+  DRAFT
+  FUNDING
+  ACTIVE
+  PAUSED
+  COMPLETED
+  EXPIRED
+  CANCELLED
+}
+
+enum AssignmentStatus {
+  AVAILABLE
+  RESERVED
+  SUBMITTED
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  DISPUTED
+}
+
+enum TxnType {
+  DEPOSIT // requester adds funds (requester wallets only)
+  ESCROW_HOLD // requester funds locked when a task is published
+  ESCROW_RELEASE // escrow released toward a worker earning
+  ESCROW_REFUND // unused escrow returned to requester
+  EARNING // worker credited for an approved deliverable
+  SALARY // employee credited a manual salary payment from the company wallet
+  PAYOUT // worker/employee withdraws earnings
+  FEE // platform fee to system wallet
+  ADJUSTMENT // admin manual correction
+  DISPUTE_HOLD // funds held pending dispute resolution
+  DISPUTE_RESOLVE // settlement of a dispute
+  REFERRAL_BONUS // platform-funded referral reward (paid from system wallet)
+}
+
+enum EmploymentStatus {
+  ONBOARDING // recruited, profile being set up, not yet active
+  EMPLOYED // active employee, eligible for salary payments
+  SUSPENDED // temporarily not paid (distinct from account UserStatus)
+  TERMINATED // no longer employed
+}
+
+enum KycStatus {
+  NONE
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum TicketStatus {
+  OPEN
+  PENDING
+  CLOSED
+}
+
+enum TxnStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REVERSED
+}
+
+enum EscrowStatus {
+  HELD
+  RELEASED
+  REFUNDED
+  PARTIAL
+}
+
+enum PayoutStatus {
+  REQUESTED
+  APPROVED
+  PROCESSING
+  PAID
+  FAILED
+  CANCELLED
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED_WORKER
+  RESOLVED_REQUESTER
+  REJECTED
+}
+
+enum NotificationType {
+  ASSIGNMENT_SUBMITTED
+  SUBMISSION_APPROVED
+  SUBMISSION_REJECTED
+  PAYOUT_PAID
+  DISPUTE_OPENED
+  DISPUTE_RESOLVED
+  TASK_FUNDED
+  SYSTEM
+}
+
+// ------------------------ Identity & Auth ------------------------
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  passwordHash  String?
+  role          Role       @default(WORKER)
+  status        UserStatus @default(ACTIVE)
+  bio           String?
+  country       String?
+
+  ratingAvg   Float @default(0)
+  ratingCount Int   @default(0)
+
+  // ---- Employment (recruiting platform) ----
+  // Set when a person is onboarded as an employee. Salary is a reference
+  // figure (cents per pay period); actual pay is credited manually by an
+  // admin via SALARY transactions. Money only ever flows company -> employee.
+  jobTitle         String?
+  department       String?
+  salaryCents      Int?
+  employmentStatus EmploymentStatus? // null = not an employee (e.g. admin/system)
+  hiredAt          DateTime?
+  managerId        String?
+  manager          User?             @relation("Manager", fields: [managerId], references: [id])
+  reports          User[]            @relation("Manager")
+
+  // KYC (identity verification for withdrawals — standard AML, not a paywall)
+  kycStatus KycStatus @default(NONE)
+
+  // Referrals — platform-funded only. referredBy is who invited this user.
+  referralCode         String? @unique
+  referredById         String?
+  referredBy           User?   @relation("Referrals", fields: [referredById], references: [id])
+  referrals            User[]  @relation("Referrals")
+  referralBonusAwarded Boolean @default(false)
+
+  accounts        Account[]
+  sessions        Session[]
+  wallet          WalletAccount?
+  tasksCreated    Task[]         @relation("RequesterTasks")
+  templates       TaskTemplate[]
+  assignments     Assignment[]
+  submissions     Submission[]
+  reviewsGiven    Review[]       @relation("ReviewAuthor")
+  reviewsReceived Review[]       @relation("ReviewTarget")
+  notifications   Notification[]
+  disputesRaised  Dispute[]      @relation("DisputeRaiser")
+  disputeMessages DisputeMessage[]
+  payouts         Payout[]
+  kyc             KycSubmission?
+  tickets         SupportTicket[]
+  ticketMessages  TicketMessage[]
+
+  // Stripe Connect account ID (workers only — used as payout destination)
+  stripeConnectId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model KycSubmission {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName     String
+  country      String
+  docType      String
+  docNumber    String
+  status       KycStatus @default(PENDING)
+  reviewedById String?
+  reviewedAt   DateTime?
+  rejectReason String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model SupportTicket {
+  id        String          @id @default(cuid())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject   String
+  status    TicketStatus    @default(OPEN)
+  messages  TicketMessage[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@index([status])
+  @@index([userId])
+}
+
+model TicketMessage {
+  id        String        @id @default(cuid())
+  ticketId  String
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User          @relation(fields: [authorId], references: [id])
+  body      String
+  isStaff   Boolean       @default(false)
+  createdAt DateTime      @default(now())
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ------------------ Tasks / Templates / Units --------------------
+
+model TaskTemplate {
+  id            String   @id @default(cuid())
+  ownerId       String
+  owner         User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  title         String
+  instructions  String
+  category      String   @default("general")
+  fieldSchema   Json
+  defaultReward Int      @default(10)
+  tasks         Task[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Task {
+  id           String     @id @default(cuid())
+  requesterId  String
+  requester    User       @relation("RequesterTasks", fields: [requesterId], references: [id])
+  templateId   String?
+  template     TaskTemplate? @relation(fields: [templateId], references: [id])
+  title        String
+  description  String
+  instructions String
+  category     String
+  fieldSchema  Json
+  rewardPerUnit   Int
+  totalUnits      Int
+  // Per-unit input items captured at draft time, consumed when units are
+  // generated on publish. Null once published.
+  draftItems      Json?
+  maxPerWorker    Int        @default(1)
+  reviewWindowH   Int        @default(72)
+  reservationTtlM Int        @default(30)
+  status          TaskStatus @default(DRAFT)
+
+  escrowHoldId String?     @unique
+  escrowHold   EscrowHold? @relation(fields: [escrowHoldId], references: [id])
+
+  assignments Assignment[]
+  reviews     Review[]
+
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, category])
+  @@index([requesterId])
+}
+
+model Assignment {
+  id        String           @id @default(cuid())
+  taskId    String
+  task      Task             @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  unitIndex Int
+  // Per-unit input shown to the worker (e.g. the image URL / text to label).
+  inputData Json?
+  status    AssignmentStatus @default(AVAILABLE)
+  workerId  String?
+  worker    User?            @relation(fields: [workerId], references: [id])
+
+  reservedAt DateTime?
+  expiresAt  DateTime?
+
+  submission Submission?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([taskId, unitIndex])
+  @@index([status, taskId])
+  @@index([workerId, status])
+}
+
+model Submission {
+  id           String           @id @default(cuid())
+  assignmentId String           @unique
+  assignment   Assignment       @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  workerId     String
+  worker       User             @relation(fields: [workerId], references: [id])
+  data         Json
+  status       SubmissionStatus @default(PENDING)
+  reviewedById String?
+  reviewedAt   DateTime?
+  rejectReason String?
+  autoApproveAt DateTime?
+  earningTxnId  String?      @unique
+
+  dispute Dispute?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, workerId])
+}
+
+// --------------- Wallet / Ledger / Escrow / Payout ---------------
+
+model WalletAccount {
+  id            String        @id @default(cuid())
+  userId        String        @unique
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance       Int           @default(0)
+  escrowBalance Int           @default(0)
+  currency      String        @default("USD")
+  transactions  Transaction[]
+  escrowHolds   EscrowHold[]
+  payouts       Payout[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Transaction {
+  id           String        @id @default(cuid())
+  walletId     String
+  wallet       WalletAccount @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  type         TxnType
+  status       TxnStatus     @default(COMPLETED)
+  amount       Int
+  balanceAfter Int
+  escrowHoldId String?
+  escrowHold   EscrowHold?   @relation(fields: [escrowHoldId], references: [id])
+  payoutId     String?
+  payout       Payout?       @relation(fields: [payoutId], references: [id])
+  refType      String?
+  refId        String?
+  providerRef  String?
+  description  String?
+  createdAt    DateTime      @default(now())
+
+  @@index([walletId, createdAt])
+  @@index([refType, refId])
+}
+
+model EscrowHold {
+  id             String        @id @default(cuid())
+  walletId       String
+  wallet         WalletAccount @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  amountTotal    Int
+  amountReleased Int           @default(0)
+  amountRefunded Int           @default(0)
+  status         EscrowStatus  @default(HELD)
+  task           Task?
+  transactions   Transaction[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Payout {
+  id            String        @id @default(cuid())
+  walletId      String
+  wallet        WalletAccount @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  amount        Int
+  status        PayoutStatus  @default(REQUESTED)
+  providerRef   String?
+  approvedById  String?
+  failureReason String?
+  transactions  Transaction[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([status])
+}
+
+// ---------------- Reviews / Disputes / Notifications -------------
+
+model Review {
+  id        String   @id @default(cuid())
+  taskId    String?
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  authorId  String
+  author    User     @relation("ReviewAuthor", fields: [authorId], references: [id])
+  targetId  String
+  target    User     @relation("ReviewTarget", fields: [targetId], references: [id])
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  @@unique([taskId, authorId, targetId])
+  @@index([targetId])
+}
+
+model Dispute {
+  id             String           @id @default(cuid())
+  submissionId   String           @unique
+  submission     Submission       @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  raisedById     String
+  raisedBy       User             @relation("DisputeRaiser", fields: [raisedById], references: [id])
+  reason         String
+  status         DisputeStatus    @default(OPEN)
+  resolutionNote String?
+  resolvedById   String?
+  resolvedAt     DateTime?
+  messages       DisputeMessage[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([status])
+}
+
+model DisputeMessage {
+  id        String   @id @default(cuid())
+  disputeId String
+  dispute   Dispute  @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  body      String
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  body      String?
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@index([userId, readAt])
+}
