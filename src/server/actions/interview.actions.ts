@@ -3,11 +3,47 @@
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import type { InterviewStatus } from "@prisma/client";
-import { requireActiveUser, requireRole } from "@/server/rbac";
+import { requireActiveUser, requireRole, requireUser } from "@/server/rbac";
 import { db } from "@/server/db";
 import { notify } from "@/server/services/notification.service";
+import { ensureRoom, createMeetingToken, isVideoEnabled } from "@/server/services/video.service";
 
 export type ActionResult = { error?: string; ok?: boolean };
+export type JoinInfo = { error?: string; roomUrl?: string; token?: string };
+
+/**
+ * Returns the live-video join info for an interview: creates the Daily room on
+ * first join and mints a short-lived token. Access limited to the candidate and
+ * admins (interviewers). Returns an error string if video isn't configured.
+ */
+export async function getInterviewJoinInfoAction(interviewId: string): Promise<JoinInfo> {
+  const user = await requireUser();
+  const interview = await db.interview.findUnique({
+    where: { id: interviewId },
+    include: { application: { include: { applicant: { select: { name: true, email: true } } } } },
+  });
+  if (!interview) return { error: "Interview not found." };
+
+  const isAdmin = user.role === "ADMIN";
+  const isCandidate = interview.application.applicantId === user.id;
+  if (!isAdmin && !isCandidate) return { error: "You don't have access to this interview." };
+
+  if (!isVideoEnabled()) return { error: "Live video is not configured." };
+
+  try {
+    const room = await ensureRoom(interviewId);
+    if (!room) return { error: "Could not create the video room." };
+    const token = await createMeetingToken({
+      roomName: room.roomName,
+      userName: isAdmin ? "GTMS Recruiter" : interview.application.applicant.name ?? "Candidate",
+      isOwner: isAdmin,
+    });
+    if (!token) return { error: "Could not create a meeting token." };
+    return { roomUrl: room.roomUrl, token };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Video join failed." };
+  }
+}
 
 /** Admin schedules a virtual interview for an application. */
 export async function scheduleInterviewAction(input: {

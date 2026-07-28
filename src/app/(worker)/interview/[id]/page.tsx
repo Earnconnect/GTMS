@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Lightbulb, Calendar, Clock } from "lucide-react";
-import { requireRole } from "@/server/rbac";
+import { requireUser } from "@/server/rbac";
 import { db } from "@/server/db";
 import { SectionCard, Badge } from "@/components/ui";
 import { InterviewRoom } from "@/components/interviews/InterviewRoom";
+import { RealInterviewRoom } from "@/components/interviews/RealInterviewRoom";
+import { isVideoEnabled } from "@/server/services/video.service";
 
 const TIPS = [
   "Find a quiet, well-lit space and test your camera and mic.",
@@ -15,7 +17,7 @@ const TIPS = [
 
 export default async function InterviewRoomPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const user = await requireRole("WORKER");
+  const user = await requireUser();
 
   const interview = await db.interview.findUnique({
     where: { id },
@@ -29,7 +31,13 @@ export default async function InterviewRoomPage({ params }: { params: Promise<{ 
     },
   });
 
-  if (!interview || interview.application.applicantId !== user.id) notFound();
+  // Both the candidate and admins (interviewers) may enter the room.
+  const canAccess =
+    interview &&
+    (interview.application.applicantId === user.id || user.role === "ADMIN");
+  if (!interview || !canAccess) notFound();
+
+  const videoLive = isVideoEnabled();
 
   return (
     <div className="space-y-6">
@@ -57,13 +65,21 @@ export default async function InterviewRoomPage({ params }: { params: Promise<{ 
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <InterviewRoom
-            interviewId={interview.id}
-            candidateName={interview.application.applicant.name}
-            candidateEmail={interview.application.applicant.email}
-            round={interview.round}
-            meetingCode={interview.meetingCode}
-          />
+          {videoLive ? (
+            <RealInterviewRoom
+              interviewId={interview.id}
+              round={interview.round}
+              meetingCode={interview.meetingCode}
+            />
+          ) : (
+            <InterviewRoom
+              interviewId={interview.id}
+              candidateName={interview.application.applicant.name}
+              candidateEmail={interview.application.applicant.email}
+              round={interview.round}
+              meetingCode={interview.meetingCode}
+            />
+          )}
         </div>
         <SectionCard title="Interview prep" description="A few tips to help you shine.">
           <ul className="space-y-3">

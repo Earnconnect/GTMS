@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { CalendarPlus, Video } from "lucide-react";
@@ -50,6 +51,12 @@ export function InterviewScheduler({
         <span className="inline-flex items-center gap-1 rounded-md bg-brand-50 px-2 py-1 font-medium text-brand-700">
           <Video className="h-3 w-3" /> {new Date(interview.scheduledAt).toLocaleString()} · {interview.round}
         </span>
+        <Link
+          href={`/interview/${interview.id}`}
+          className="inline-flex items-center gap-1 rounded-md bg-brand-600 px-2.5 py-1 font-medium text-white hover:bg-brand-700"
+        >
+          <Video className="h-3 w-3" /> Join
+        </Link>
         <Button size="sm" variant="success" disabled={pending} onClick={() => outcome("COMPLETED")}>
           Mark done
         </Button>

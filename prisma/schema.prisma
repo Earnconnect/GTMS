@@ -631,6 +631,9 @@ model Interview {
   interviewerId String
   round         String          @default("Screening")
   feedback      String?
+  // Populated on first join when a real video provider (Daily) is configured.
+  dailyRoomName String?
+  dailyRoomUrl  String?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 
