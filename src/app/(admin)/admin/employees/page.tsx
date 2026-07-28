@@ -1,6 +1,6 @@
 import { requireRole } from "@/server/rbac";
 import { db } from "@/server/db";
-import { Badge, PageHeader } from "@/components/ui";
+import { Badge, PageHeader, Avatar } from "@/components/ui";
 import { EmployeeControls } from "@/components/admin/EmployeeControls";
 import { OnboardEmployeeForm } from "@/components/admin/OnboardEmployeeForm";
 import { formatMoney } from "@/lib/money";
@@ -45,37 +45,42 @@ export default async function AdminEmployeesPage() {
 
       <OnboardEmployeeForm candidates={candidates} />
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+      <div className="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-card">
         <table className="w-full text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase text-slate-500">
+          <thead className="border-b border-slate-100 bg-slate-50/70 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
             <tr>
-              <th className="px-4 py-2">Employee</th>
-              <th className="px-4 py-2">Role</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2 text-right">Balance</th>
-              <th className="px-4 py-2 text-right">Pay</th>
+              <th className="px-5 py-3">Employee</th>
+              <th className="px-5 py-3">Role</th>
+              <th className="px-5 py-3">Status</th>
+              <th className="px-5 py-3 text-right">Balance</th>
+              <th className="px-5 py-3 text-right">Pay</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-slate-50">
             {employees.map((e) => (
-              <tr key={e.id} className="border-b border-slate-50 last:border-0">
-                <td className="px-4 py-2">
-                  <div className="font-medium text-slate-800">{e.name ?? "—"}</div>
-                  <div className="text-xs text-slate-400">{e.email}</div>
+              <tr key={e.id} className="transition-colors hover:bg-slate-50/50">
+                <td className="px-5 py-3">
+                  <div className="flex items-center gap-3">
+                    <Avatar name={e.name} email={e.email} size={38} />
+                    <div className="min-w-0">
+                      <div className="truncate font-medium text-slate-800">{e.name ?? "—"}</div>
+                      <div className="truncate text-xs text-slate-400">{e.email}</div>
+                    </div>
+                  </div>
                 </td>
-                <td className="px-4 py-2 text-slate-600">
-                  <div>{e.jobTitle ?? "—"}</div>
+                <td className="px-5 py-3 text-slate-600">
+                  <div className="font-medium text-slate-700">{e.jobTitle ?? "—"}</div>
                   <div className="text-xs text-slate-400">{e.department ?? ""}</div>
                 </td>
-                <td className="px-4 py-2">
+                <td className="px-5 py-3">
                   <Badge tone={STATUS_TONE[e.employmentStatus ?? "ONBOARDING"]}>
                     {e.employmentStatus}
                   </Badge>
                 </td>
-                <td className="px-4 py-2 text-right text-slate-600">
+                <td className="px-5 py-3 text-right font-medium text-slate-700 tabular-nums">
                   {formatMoney(e.wallet?.balance ?? 0)}
                 </td>
-                <td className="px-4 py-2">
+                <td className="px-5 py-3">
                   <EmployeeControls
                     employeeId={e.id}
                     employmentStatus={e.employmentStatus}
@@ -86,7 +91,7 @@ export default async function AdminEmployeesPage() {
             ))}
             {employees.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-sm text-slate-400">
+                <td colSpan={5} className="px-5 py-10 text-center text-sm text-slate-400">
                   No employees yet. Onboard someone above.
                 </td>
               </tr>

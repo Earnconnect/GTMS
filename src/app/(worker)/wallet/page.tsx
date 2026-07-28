@@ -1,7 +1,8 @@
+import { Wallet as WalletIcon, TrendingUp, BadgeCheck, CheckCircle2 } from "lucide-react";
 import { requireRole } from "@/server/rbac";
 import { db } from "@/server/db";
 import { getOrCreateWallet } from "@/server/services/wallet.service";
-import { PageHeader, Card } from "@/components/ui";
+import { PageHeader, StatCard, SectionCard } from "@/components/ui";
 import { PayoutForm } from "@/components/wallet/PayoutForm";
 import { StripeConnectButton } from "@/components/wallet/StripeConnectButton";
 import { TxnTable } from "@/components/wallet/TxnTable";
@@ -38,87 +39,81 @@ export default async function WorkerWalletPage({
       take: 10,
     }),
     db.transaction.aggregate({
-      where: { walletId: wallet.id, type: "EARNING" },
+      where: { walletId: wallet.id, type: "SALARY", amount: { gt: 0 } },
       _sum: { amount: true },
     }),
   ]);
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
-        title="Wallet"
-        subtitle="Your earnings. Withdraw any time above the minimum — no fees, no unlocks."
+        title="Pay & wallet"
+        subtitle="Your salary and withdrawals. Withdraw any time above the minimum — no fees, no unlocks."
       />
 
       {sp.stripe_connected === "1" && (
-        <div className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-700">
-          Stripe account linked. Payouts will be sent directly to your bank once approved.
+        <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          <CheckCircle2 className="h-4 w-4" />
+          Stripe account linked. Payouts will be sent to your bank once approved.
         </div>
       )}
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-2">
-        <Card>
-          <p className="text-sm text-slate-500">Available to withdraw</p>
-          <p className="mt-1 text-3xl font-semibold text-slate-900">
-            {formatMoney(wallet.balance)}
-          </p>
-        </Card>
-        <Card>
-          <p className="text-sm text-slate-500">Lifetime earnings</p>
-          <p className="mt-1 text-3xl font-semibold text-slate-900">
-            {formatMoney(lifetime._sum.amount ?? 0)}
-          </p>
-        </Card>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <StatCard label="Available to withdraw" value={formatMoney(wallet.balance)} icon={<WalletIcon className="h-5 w-5" />} tone="brand" />
+        <StatCard label="Total salary received" value={formatMoney(lifetime._sum.amount ?? 0)} icon={<TrendingUp className="h-5 w-5" />} tone="emerald" />
       </div>
 
       {!kycApproved && (
-        <div className="mb-6 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-700">
-          Complete{" "}
-          <a href="/kyc" className="font-medium underline">
-            identity verification
-          </a>{" "}
-          to withdraw your earnings. It&apos;s a one-time, free check — your tasks
-          and earnings are unaffected.
+        <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <BadgeCheck className="h-5 w-5 shrink-0" />
+          <span>
+            Complete{" "}
+            <a href="/kyc" className="font-semibold underline">
+              identity verification
+            </a>{" "}
+            to withdraw. It&apos;s a one-time, free check — it does not affect your
+            salary.
+          </span>
         </div>
       )}
 
       {isStripe && (
-        <Card className="mb-6">
-          <h2 className="mb-3 text-sm font-semibold text-slate-700">Payout account</h2>
+        <SectionCard title="Payout account" description="Connect a bank for automatic transfers.">
           <StripeConnectButton isConnected={stripeConnected} />
           {!stripeConnected && (
             <p className="mt-2 text-xs text-slate-400">
               You can still request payouts without a connected account — admin will
-              process them manually. Connecting enables automatic bank transfers.
+              process them manually.
             </p>
           )}
-        </Card>
+        </SectionCard>
       )}
 
-      <Card className="mb-6">
+      <SectionCard title="Withdraw" description="Request a payout from your available balance.">
         <PayoutForm balance={wallet.balance} minPayout={MIN_PAYOUT_CENTS} />
-      </Card>
+      </SectionCard>
 
       {payouts.length > 0 && (
-        <div className="mb-6">
-          <h2 className="mb-3 text-lg font-semibold">Payouts</h2>
-          <div className="space-y-2">
+        <SectionCard title="Withdrawals" description="Your payout requests and their status.">
+          <ul className="divide-y divide-slate-100">
             {payouts.map((p) => (
-              <Card key={p.id}>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">
-                    {p.createdAt.toLocaleDateString()} — {formatMoney(p.amount)}
-                  </span>
-                  <StatusBadge status={p.status} />
+              <li key={p.id} className="flex items-center justify-between gap-3 py-3">
+                <div>
+                  <p className="text-sm font-medium text-slate-800 tabular-nums">
+                    {formatMoney(p.amount)}
+                  </p>
+                  <p className="text-xs text-slate-400">{p.createdAt.toLocaleString()}</p>
                 </div>
-              </Card>
+                <StatusBadge status={p.status} />
+              </li>
             ))}
-          </div>
-        </div>
+          </ul>
+        </SectionCard>
       )}
 
-      <h2 className="mb-3 text-lg font-semibold">Transactions</h2>
-      <TxnTable txns={txns} />
+      <SectionCard title="Transactions" description="Every credit and debit on your wallet.">
+        <TxnTable txns={txns} />
+      </SectionCard>
     </div>
   );
 }

@@ -2,10 +2,10 @@ import { requireRole } from "@/server/rbac";
 import { AppShell, type NavItem } from "@/components/layout/AppShell";
 
 const WORKER_NAV: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/wallet", label: "Pay & wallet" },
-  { href: "/kyc", label: "Verification" },
-  { href: "/support", label: "Support" },
+  { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
+  { href: "/wallet", label: "Pay & wallet", icon: "wallet" },
+  { href: "/kyc", label: "Verification", icon: "verify" },
+  { href: "/support", label: "Support", icon: "support" },
 ];
 
 export default async function WorkerLayout({
