@@ -185,6 +185,15 @@ model User {
   tickets         SupportTicket[]
   ticketMessages  TicketMessage[]
 
+  // ---- HR platform features ----
+  onboardingStage OnboardingStage @default(NOT_STARTED)
+  jobPostings     JobPosting[]        @relation("JobPoster")
+  applications    JobApplication[]    @relation("Applicant")
+  enrollments     TrainingEnrollment[]
+  jobReports      JobReport[]
+  documents       OnboardingDocument[]
+  retirementPlan  RetirementPlan?
+
   // Stripe Connect account ID (workers only — used as payout destination)
   stripeConnectId String?
 
@@ -493,4 +502,202 @@ model Notification {
   createdAt DateTime         @default(now())
 
   @@index([userId, readAt])
+}
+
+// ----------------------- HR platform -----------------------
+
+enum OnboardingStage {
+  NOT_STARTED
+  DOCUMENTS
+  TRAINING
+  BENEFITS
+  COMPLETE
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  REMOTE
+  INTERNSHIP
+}
+
+enum JobStatus {
+  DRAFT
+  OPEN
+  CLOSED
+}
+
+enum ApplicationStatus {
+  APPLIED
+  UNDER_REVIEW
+  INTERVIEW
+  PLACED
+  REJECTED
+  WITHDRAWN
+}
+
+enum TrainingLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum TrainingStatus {
+  ENROLLED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum ReportCategory {
+  PROGRESS
+  ISSUE
+  INCIDENT
+  PAYROLL
+  EQUIPMENT
+  OTHER
+}
+
+enum ReportStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+enum DocStatus {
+  NOT_SUBMITTED
+  SUBMITTED
+  VERIFIED
+  REJECTED
+}
+
+// ---- Jobs placement ----
+
+model JobPosting {
+  id               String           @id @default(cuid())
+  title            String
+  department       String
+  location         String           @default("Remote")
+  type             JobType          @default(FULL_TIME)
+  description      String
+  responsibilities String?
+  salaryMinCents   Int?
+  salaryMaxCents   Int?
+  status           JobStatus        @default(OPEN)
+  postedById       String
+  postedBy         User             @relation("JobPoster", fields: [postedById], references: [id])
+  applications     JobApplication[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@index([status])
+}
+
+model JobApplication {
+  id          String            @id @default(cuid())
+  jobId       String
+  job         JobPosting        @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  applicantId String
+  applicant   User              @relation("Applicant", fields: [applicantId], references: [id], onDelete: Cascade)
+  status      ApplicationStatus @default(APPLIED)
+  coverNote   String?
+  decidedById String?
+  decidedAt   DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@unique([jobId, applicantId])
+  @@index([applicantId])
+  @@index([status])
+}
+
+// ---- Bootcamp / training ----
+
+model TrainingCourse {
+  id           String               @id @default(cuid())
+  title        String
+  summary      String
+  description  String?
+  category     String               @default("General")
+  level        TrainingLevel        @default(BEGINNER)
+  durationHours Int                 @default(4)
+  moduleCount  Int                  @default(5)
+  published    Boolean              @default(true)
+  enrollments  TrainingEnrollment[]
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+}
+
+model TrainingEnrollment {
+  id          String         @id @default(cuid())
+  courseId    String
+  course      TrainingCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status      TrainingStatus @default(ENROLLED)
+  progressPct Int            @default(0)
+  completedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@unique([courseId, userId])
+  @@index([userId])
+}
+
+// ---- Employee job reports ----
+
+model JobReport {
+  id             String         @id @default(cuid())
+  authorId       String
+  author         User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category       ReportCategory @default(PROGRESS)
+  subject        String
+  body           String
+  status         ReportStatus   @default(SUBMITTED)
+  priority       String         @default("normal")
+  resolutionNote String?
+  reviewedById   String?
+  reviewedAt     DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([authorId])
+  @@index([status])
+}
+
+// ---- Onboarding document verification ----
+
+model OnboardingDocument {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  docType      String
+  label        String
+  required     Boolean   @default(true)
+  status       DocStatus @default(NOT_SUBMITTED)
+  fileName     String?
+  note         String?
+  reviewedById String?
+  reviewedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([userId, docType])
+  @@index([userId])
+}
+
+// ---- 401(k) retirement benefit (simulated — no real accounts) ----
+
+model RetirementPlan {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enrolled         Boolean  @default(false)
+  contributionPct  Int      @default(0)
+  employerMatchPct Int      @default(4)
+  balanceCents     Int      @default(0)
+  provider         String   @default("GTMS Retirement (simulated)")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }

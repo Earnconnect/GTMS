@@ -8,8 +8,22 @@ import {
   ArrowDownToLine,
   ArrowRight,
   CheckCircle2,
+  Briefcase,
+  GraduationCap,
+  FileWarning,
+  ClipboardCheck,
+  PiggyBank,
 } from "lucide-react";
 import { ButtonLink } from "@/components/ui";
+
+const PLATFORM_FEATURES = [
+  { icon: ClipboardCheck, title: "Guided onboarding", body: "A step-by-step flow with document verification, benefits, and training." },
+  { icon: Briefcase, title: "Job placements", body: "An internal roles board — apply and get placed through a real pipeline." },
+  { icon: GraduationCap, title: "Bootcamp & training", body: "Structured courses to ramp new hires with progress tracking." },
+  { icon: PiggyBank, title: "401(k) benefits", body: "Enroll, set your contribution, and see your employer match." },
+  { icon: FileWarning, title: "Employee reports", body: "Submit progress, flag issues, and track resolutions." },
+  { icon: Banknote, title: "Salary & payroll", body: "Get paid to your wallet and withdraw — company to employee only." },
+];
 
 function Logo({ light = false }: { light?: boolean }) {
   return (
@@ -109,6 +123,33 @@ export default function LandingPage() {
                 </span>
                 <span className="text-sm font-semibold text-slate-300">{f.step}</span>
               </div>
+              <h3 className="mt-4 text-base font-semibold text-slate-900">{f.title}</h3>
+              <p className="mt-2 text-sm text-slate-600">{f.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Platform features */}
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-3xl font-semibold tracking-tight text-slate-900">
+            Everything a real team needs
+          </h2>
+          <p className="mt-3 text-slate-600">
+            From the first application to payday — recruiting, onboarding, training,
+            benefits, and payroll in one professional platform.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {PLATFORM_FEATURES.map((f) => (
+            <div
+              key={f.title}
+              className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-card transition-shadow hover:shadow-card-hover"
+            >
+              <span className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-brand-50 to-emerald-50 text-brand-700">
+                <f.icon className="h-5 w-5" />
+              </span>
               <h3 className="mt-4 text-base font-semibold text-slate-900">{f.title}</h3>
               <p className="mt-2 text-sm text-slate-600">{f.body}</p>
             </div>

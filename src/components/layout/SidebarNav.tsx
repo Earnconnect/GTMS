@@ -13,6 +13,10 @@ import {
   ArrowDownToLine,
   BookOpenCheck,
   ShieldCheck,
+  Briefcase,
+  GraduationCap,
+  FileWarning,
+  ClipboardCheck,
   type LucideIcon,
 } from "lucide-react";
 import { clsx } from "@/lib/cn";
@@ -30,6 +34,10 @@ const ICONS: Record<string, LucideIcon> = {
   withdrawals: ArrowDownToLine,
   ledger: BookOpenCheck,
   shield: ShieldCheck,
+  jobs: Briefcase,
+  training: GraduationCap,
+  reports: FileWarning,
+  onboarding: ClipboardCheck,
 };
 
 export function SidebarNav({ items }: { items: NavItem[] }) {
