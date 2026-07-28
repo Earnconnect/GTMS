@@ -604,11 +604,36 @@ model JobApplication {
   coverNote   String?
   decidedById String?
   decidedAt   DateTime?
+  interview   Interview?
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 
   @@unique([jobId, applicantId])
   @@index([applicantId])
+  @@index([status])
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+model Interview {
+  id            String          @id @default(cuid())
+  applicationId String          @unique
+  application   JobApplication  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  scheduledAt   DateTime
+  durationMins  Int             @default(30)
+  status        InterviewStatus @default(SCHEDULED)
+  meetingCode   String
+  interviewerId String
+  round         String          @default("Screening")
+  feedback      String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
   @@index([status])
 }
 
@@ -624,22 +649,48 @@ model TrainingCourse {
   durationHours Int                 @default(4)
   moduleCount  Int                  @default(5)
   published    Boolean              @default(true)
+  modules      TrainingModule[]
   enrollments  TrainingEnrollment[]
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
 }
 
+model TrainingModule {
+  id           String             @id @default(cuid())
+  courseId     String
+  course       TrainingCourse     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  order        Int
+  title        String
+  content      String
+  durationMins Int                @default(15)
+  completions  ModuleCompletion[]
+
+  @@unique([courseId, order])
+}
+
+model ModuleCompletion {
+  id           String             @id @default(cuid())
+  moduleId     String
+  module       TrainingModule     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  enrollmentId String
+  enrollment   TrainingEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  completedAt  DateTime           @default(now())
+
+  @@unique([moduleId, enrollmentId])
+}
+
 model TrainingEnrollment {
-  id          String         @id @default(cuid())
+  id          String             @id @default(cuid())
   courseId    String
-  course      TrainingCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course      TrainingCourse     @relation(fields: [courseId], references: [id], onDelete: Cascade)
   userId      String
-  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status      TrainingStatus @default(ENROLLED)
-  progressPct Int            @default(0)
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status      TrainingStatus     @default(ENROLLED)
+  progressPct Int                @default(0)
   completedAt DateTime?
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  completions ModuleCompletion[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
 
   @@unique([courseId, userId])
   @@index([userId])

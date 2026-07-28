@@ -58,35 +58,99 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-gradient-to-b from-brand-50 to-transparent" />
-        <div className="relative mx-auto max-w-6xl px-6 pb-16 pt-20 text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-3 py-1 text-xs font-semibold text-brand-700 shadow-sm">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            Recruiting &amp; payroll, done right
-          </span>
-          <h1 className="mx-auto mt-6 max-w-3xl text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-            Get recruited, get to work,{" "}
-            <span className="bg-gradient-to-r from-brand-600 to-emerald-500 bg-clip-text text-transparent">
-              get paid
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-gradient-to-b from-brand-50 via-emerald-50/40 to-transparent" />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.35]"
+          style={{
+            backgroundImage: "radial-gradient(#99f6e4 0.9px, transparent 0.9px)",
+            backgroundSize: "24px 24px",
+            maskImage: "linear-gradient(to bottom, black, transparent 55%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black, transparent 55%)",
+          }}
+        />
+        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-6 pb-16 pt-20 lg:grid-cols-2">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-3 py-1 text-xs font-semibold text-brand-700 shadow-sm">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              The all-in-one workforce platform
             </span>
-          </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-lg text-slate-600">
-            We recruit people to work with us and pay them a salary. Apply for an
-            account, get onboarded by our team, and receive your pay directly in
-            your wallet — withdraw any time. You never pay us a cent.
-          </p>
-          <div className="mt-8 flex items-center justify-center gap-3">
-            <ButtonLink href="/register" size="lg" className="gap-2">
-              Apply to join <ArrowRight className="h-4 w-4" />
-            </ButtonLink>
-            <ButtonLink href="/login" size="lg" variant="secondary">
-              Sign in
-            </ButtonLink>
+            <h1 className="mt-6 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+              Hire, onboard, train, and{" "}
+              <span className="bg-gradient-to-r from-brand-600 to-emerald-500 bg-clip-text text-transparent">
+                pay your team
+              </span>
+            </h1>
+            <p className="mt-5 max-w-xl text-lg text-slate-600">
+              GTMS brings recruiting, onboarding, learning, and payroll into one
+              professional workspace. Apply, get onboarded by our team, complete your
+              training, and receive your salary in your wallet — withdraw any time.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <ButtonLink href="/register" size="lg" className="gap-2">
+                Apply to join <ArrowRight className="h-4 w-4" />
+              </ButtonLink>
+              <ButtonLink href="/login" size="lg" variant="secondary">
+                Sign in
+              </ButtonLink>
+            </div>
+            <p className="mt-4 flex items-center gap-2 text-xs text-slate-400">
+              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              Free to apply · No deposits · Withdraw anytime
+            </p>
           </div>
-          <p className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-400">
-            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-            Free to apply · No deposits · Withdraw anytime
-          </p>
+
+          {/* Product preview graphic */}
+          <div className="relative">
+            <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-br from-brand-200/40 to-emerald-200/40 blur-2xl" />
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-soft">
+              <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                <span className="h-2.5 w-2.5 rounded-full bg-red-300" />
+                <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
+                <span className="ml-2 text-xs font-medium text-slate-400">GTMS · Dashboard</span>
+              </div>
+              <div className="grid grid-cols-3 gap-3 pt-4">
+                {[
+                  ["Employees", "128", "from-brand-500 to-brand-600"],
+                  ["Paid this run", "$92k", "from-emerald-500 to-emerald-600"],
+                  ["Onboarding", "94%", "from-teal-500 to-emerald-500"],
+                ].map(([label, val, grad]) => (
+                  <div key={label as string} className="rounded-xl border border-slate-100 bg-slate-50/60 p-3">
+                    <div className={`mb-2 grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br ${grad} text-white`}>
+                      <Banknote className="h-3.5 w-3.5" />
+                    </div>
+                    <p className="text-[10px] text-slate-400">{label}</p>
+                    <p className="text-sm font-bold text-slate-800">{val}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 space-y-2">
+                {[70, 45, 88].map((w, i) => (
+                  <div key={i} className="flex items-center gap-3 rounded-lg border border-slate-100 p-2.5">
+                    <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-to-br from-brand-400 to-emerald-400" />
+                    <div className="flex-1">
+                      <div className="h-2 w-24 rounded-full bg-slate-200" />
+                      <div className="mt-1.5 h-1.5 rounded-full bg-slate-100">
+                        <div className="h-full rounded-full bg-gradient-to-r from-brand-500 to-emerald-500" style={{ width: `${w}%` }} />
+                      </div>
+                    </div>
+                    <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-600">Paid</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="absolute -bottom-5 -left-5 hidden rounded-xl border border-slate-200 bg-white p-3 shadow-card sm:block">
+              <div className="flex items-center gap-2">
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-50 text-emerald-600">
+                  <ClipboardCheck className="h-4 w-4" />
+                </span>
+                <div>
+                  <p className="text-[10px] text-slate-400">Onboarding complete</p>
+                  <p className="text-xs font-semibold text-slate-800">Welcome aboard 🎉</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

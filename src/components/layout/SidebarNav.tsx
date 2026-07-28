@@ -17,6 +17,7 @@ import {
   GraduationCap,
   FileWarning,
   ClipboardCheck,
+  Video,
   type LucideIcon,
 } from "lucide-react";
 import { clsx } from "@/lib/cn";
@@ -38,6 +39,7 @@ const ICONS: Record<string, LucideIcon> = {
   training: GraduationCap,
   reports: FileWarning,
   onboarding: ClipboardCheck,
+  interview: Video,
 };
 
 export function SidebarNav({ items }: { items: NavItem[] }) {

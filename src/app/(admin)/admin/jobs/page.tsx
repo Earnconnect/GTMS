@@ -3,6 +3,7 @@ import { requireRole } from "@/server/rbac";
 import { db } from "@/server/db";
 import { PageHeader, Badge, SectionCard, Avatar, EmptyState } from "@/components/ui";
 import { CreateJobForm, JobStatusToggle, ApplicationDecision } from "@/components/admin/JobAdmin";
+import { InterviewScheduler } from "@/components/admin/InterviewScheduler";
 import { formatMoney } from "@/lib/money";
 
 const APP_TONE: Record<string, "gray" | "yellow" | "green" | "blue" | "red"> = {
@@ -21,7 +22,7 @@ export default async function AdminJobsPage() {
     include: {
       applications: {
         orderBy: { createdAt: "desc" },
-        include: { applicant: { select: { name: true, email: true } } },
+        include: { applicant: { select: { name: true, email: true } }, interview: true },
       },
     },
   });
@@ -64,18 +65,34 @@ export default async function AdminJobsPage() {
             ) : (
               <ul className="divide-y divide-slate-100">
                 {job.applications.map((a) => (
-                  <li key={a.id} className="flex flex-col gap-3 py-3 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="flex items-center gap-3">
-                      <Avatar name={a.applicant.name} email={a.applicant.email} size={34} />
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-slate-800">
-                          {a.applicant.name ?? a.applicant.email}
-                        </p>
-                        {a.coverNote && <p className="truncate text-xs text-slate-400">{a.coverNote}</p>}
+                  <li key={a.id} className="space-y-3 py-4">
+                    <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                      <div className="flex items-center gap-3">
+                        <Avatar name={a.applicant.name} email={a.applicant.email} size={34} />
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium text-slate-800">
+                            {a.applicant.name ?? a.applicant.email}
+                          </p>
+                          {a.coverNote && <p className="truncate text-xs text-slate-400">{a.coverNote}</p>}
+                        </div>
+                        <Badge tone={APP_TONE[a.status]}>{a.status.replace("_", " ")}</Badge>
                       </div>
-                      <Badge tone={APP_TONE[a.status]}>{a.status.replace("_", " ")}</Badge>
+                      <ApplicationDecision applicationId={a.id} />
                     </div>
-                    <ApplicationDecision applicationId={a.id} />
+                    <InterviewScheduler
+                      applicationId={a.id}
+                      interview={
+                        a.interview
+                          ? {
+                              id: a.interview.id,
+                              scheduledAt: a.interview.scheduledAt.toISOString(),
+                              round: a.interview.round,
+                              status: a.interview.status,
+                              meetingCode: a.interview.meetingCode,
+                            }
+                          : null
+                      }
+                    />
                   </li>
                 ))}
               </ul>

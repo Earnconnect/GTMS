@@ -5,6 +5,7 @@ const WORKER_NAV: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
   { href: "/onboarding", label: "Onboarding", icon: "onboarding" },
   { href: "/jobs", label: "Job placements", icon: "jobs" },
+  { href: "/interviews", label: "Interviews", icon: "interview" },
   { href: "/training", label: "Bootcamp", icon: "training" },
   { href: "/reports", label: "Reports", icon: "reports" },
   { href: "/wallet", label: "Pay & wallet", icon: "wallet" },

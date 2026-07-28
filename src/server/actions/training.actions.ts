@@ -50,6 +50,54 @@ export async function updateProgressAction(input: {
   return { ok: true };
 }
 
+/**
+ * Employee completes a single module. Progress is recomputed from actual
+ * completed modules — no more fake percentage bumping.
+ */
+export async function completeModuleAction(input: {
+  courseId: string;
+  moduleId: string;
+}): Promise<ActionResult> {
+  const user = await requireActiveUser();
+  try {
+    const course = await db.trainingCourse.findUnique({
+      where: { id: input.courseId },
+      include: { modules: true },
+    });
+    if (!course) return { error: "Course not found." };
+
+    const enrollment = await db.trainingEnrollment.upsert({
+      where: { courseId_userId: { courseId: input.courseId, userId: user.id } },
+      update: {},
+      create: { courseId: input.courseId, userId: user.id },
+    });
+
+    await db.moduleCompletion.upsert({
+      where: { moduleId_enrollmentId: { moduleId: input.moduleId, enrollmentId: enrollment.id } },
+      update: {},
+      create: { moduleId: input.moduleId, enrollmentId: enrollment.id },
+    });
+
+    const done = await db.moduleCompletion.count({ where: { enrollmentId: enrollment.id } });
+    const total = Math.max(course.modules.length, 1);
+    const pct = Math.min(100, Math.round((done / total) * 100));
+    const complete = done >= total;
+    await db.trainingEnrollment.update({
+      where: { id: enrollment.id },
+      data: {
+        progressPct: pct,
+        status: complete ? "COMPLETED" : pct > 0 ? "IN_PROGRESS" : "ENROLLED",
+        completedAt: complete ? new Date() : null,
+      },
+    });
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Could not update progress" };
+  }
+  revalidatePath(`/training/${input.courseId}`);
+  revalidatePath("/training");
+  return { ok: true };
+}
+
 /** Admin creates a training course. */
 export async function createCourseAction(input: {
   title: string;
