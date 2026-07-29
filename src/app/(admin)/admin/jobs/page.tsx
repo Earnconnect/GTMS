@@ -22,7 +22,7 @@ export default async function AdminJobsPage() {
     include: {
       applications: {
         orderBy: { createdAt: "desc" },
-        include: { applicant: { select: { name: true, email: true, cvUrl: true } }, interview: true },
+        include: { applicant: { select: { id: true, name: true, email: true, cvUrl: true } }, interview: true },
       },
     },
   });
@@ -76,7 +76,7 @@ export default async function AdminJobsPage() {
                           {a.coverNote && <p className="truncate text-xs text-slate-400">{a.coverNote}</p>}
                           {a.applicant.cvUrl && (
                             <a
-                              href={a.applicant.cvUrl}
+                              href={`/api/cv/${a.applicant.id}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs font-medium text-brand-600 hover:underline"

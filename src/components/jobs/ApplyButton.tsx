@@ -2,22 +2,22 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { FileText } from "lucide-react";
+import { FileText, CheckCircle2 } from "lucide-react";
 import { applyToJobAction } from "@/server/actions/job.actions";
 import { Button, Input, Textarea } from "@/components/ui";
 
-export function ApplyButton({ jobId, cvOnFile }: { jobId: string; cvOnFile?: string | null }) {
+export function ApplyButton({ jobId, hasCv }: { jobId: string; hasCv?: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
-  const [cvUrl, setCvUrl] = useState(cvOnFile ?? "");
+  const [cvUrl, setCvUrl] = useState("");
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
   function apply() {
     setError(null);
     start(async () => {
-      const res = await applyToJobAction({ jobId, coverNote: note, cvUrl });
+      const res = await applyToJobAction({ jobId, coverNote: note, cvUrl: cvUrl || undefined });
       if (res.error) setError(res.error);
       else {
         setOpen(false);
@@ -36,18 +36,25 @@ export function ApplyButton({ jobId, cvOnFile }: { jobId: string; cvOnFile?: str
 
   return (
     <div className="w-full space-y-2">
-      <div>
-        <label className="mb-1 flex items-center gap-1 text-xs font-medium text-slate-500">
-          <FileText className="h-3 w-3" /> CV link {cvOnFile && <span className="text-emerald-600">· on file</span>}
-        </label>
-        <Input
-          type="url"
-          value={cvUrl}
-          onChange={(e) => setCvUrl(e.target.value)}
-          placeholder="https://link-to-your-cv"
-          disabled={pending}
-        />
-      </div>
+      {hasCv ? (
+        <p className="flex items-center gap-1.5 text-xs text-emerald-600">
+          <CheckCircle2 className="h-3.5 w-3.5" /> Your CV from your profile will be attached.
+        </p>
+      ) : (
+        <div>
+          <label className="mb-1 flex items-center gap-1 text-xs font-medium text-slate-500">
+            <FileText className="h-3 w-3" /> CV link (optional)
+          </label>
+          <Input
+            type="url"
+            value={cvUrl}
+            onChange={(e) => setCvUrl(e.target.value)}
+            placeholder="https://link-to-your-cv"
+            disabled={pending}
+          />
+          <p className="mt-1 text-[11px] text-slate-400">Or upload a file on your Onboarding page.</p>
+        </div>
+      )}
       <Textarea
         rows={2}
         value={note}

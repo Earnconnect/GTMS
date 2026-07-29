@@ -121,7 +121,7 @@ export default async function JobsPage() {
                       {status.replace("_", " ")}
                     </Badge>
                   ) : (
-                    <ApplyButton jobId={job.id} cvOnFile={me?.cvUrl} />
+                    <ApplyButton jobId={job.id} hasCv={Boolean(me?.cvUrl)} />
                   )}
                 </div>
               </div>

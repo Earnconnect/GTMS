@@ -189,6 +189,7 @@ model User {
   onboardingStage OnboardingStage @default(NOT_STARTED)
   // Résumé / CV — stored as a link + optional pasted summary (no file storage).
   cvUrl           String?
+  cvFileName      String?
   cvSummary       String?
   cvSubmittedAt   DateTime?
   jobPostings     JobPosting[]        @relation("JobPoster")

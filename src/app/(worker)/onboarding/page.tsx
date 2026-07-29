@@ -11,6 +11,7 @@ import {
 import { DocumentRow, RetirementForm } from "@/components/onboarding/OnboardingClient";
 import { WithdrawalMethodForm } from "@/components/wallet/WithdrawalMethodForm";
 import { CvForm } from "@/components/profile/CvForm";
+import { isUploadEnabled } from "@/server/uploads";
 import { Landmark } from "lucide-react";
 
 export default async function OnboardingPage() {
@@ -19,7 +20,7 @@ export default async function OnboardingPage() {
   const [profile] = await Promise.all([
     db.user.findUnique({
       where: { id: user.id },
-      select: { salaryCents: true, cvUrl: true, cvSummary: true, cvSubmittedAt: true },
+      select: { salaryCents: true, cvUrl: true, cvFileName: true, cvSummary: true, cvSubmittedAt: true },
     }),
     ensureOnboardingDocuments(user.id),
     ensureRetirementPlan(user.id),
@@ -70,7 +71,14 @@ export default async function OnboardingPage() {
           </span>
         }
       >
-        <CvForm cvUrl={profile?.cvUrl ?? null} cvSummary={profile?.cvSummary ?? null} submittedAt={profile?.cvSubmittedAt ?? null} />
+        <CvForm
+          userId={user.id}
+          cvUrl={profile?.cvUrl ?? null}
+          cvFileName={profile?.cvFileName ?? null}
+          cvSummary={profile?.cvSummary ?? null}
+          submittedAt={profile?.cvSubmittedAt ?? null}
+          uploadEnabled={isUploadEnabled()}
+        />
       </SectionCard>
 
       <div className="grid gap-6 lg:grid-cols-5">
