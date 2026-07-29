@@ -10,13 +10,17 @@ import {
 } from "@/server/services/onboarding.service";
 import { DocumentRow, RetirementForm } from "@/components/onboarding/OnboardingClient";
 import { WithdrawalMethodForm } from "@/components/wallet/WithdrawalMethodForm";
+import { CvForm } from "@/components/profile/CvForm";
 import { Landmark } from "lucide-react";
 
 export default async function OnboardingPage() {
   const user = await requireRole("WORKER");
 
   const [profile] = await Promise.all([
-    db.user.findUnique({ where: { id: user.id }, select: { salaryCents: true } }),
+    db.user.findUnique({
+      where: { id: user.id },
+      select: { salaryCents: true, cvUrl: true, cvSummary: true, cvSubmittedAt: true },
+    }),
     ensureOnboardingDocuments(user.id),
     ensureRetirementPlan(user.id),
   ]);
@@ -54,6 +58,19 @@ export default async function OnboardingPage() {
             </li>
           ))}
         </ol>
+      </SectionCard>
+
+      {/* CV / résumé */}
+      <SectionCard
+        title="Résumé / CV"
+        description="Submit your CV so our team can review your background."
+        action={
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-50 text-brand-700">
+            <FileText className="h-4 w-4" />
+          </span>
+        }
+      >
+        <CvForm cvUrl={profile?.cvUrl ?? null} cvSummary={profile?.cvSummary ?? null} submittedAt={profile?.cvSubmittedAt ?? null} />
       </SectionCard>
 
       <div className="grid gap-6 lg:grid-cols-5">

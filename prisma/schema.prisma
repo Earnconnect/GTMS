@@ -187,6 +187,10 @@ model User {
 
   // ---- HR platform features ----
   onboardingStage OnboardingStage @default(NOT_STARTED)
+  // Résumé / CV — stored as a link + optional pasted summary (no file storage).
+  cvUrl           String?
+  cvSummary       String?
+  cvSubmittedAt   DateTime?
   jobPostings     JobPosting[]        @relation("JobPoster")
   applications    JobApplication[]    @relation("Applicant")
   enrollments     TrainingEnrollment[]

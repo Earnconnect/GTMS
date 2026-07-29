@@ -31,7 +31,7 @@ function salaryRange(min: number | null, max: number | null) {
 export default async function JobsPage() {
   const user = await requireRole("WORKER");
 
-  const [jobs, myApps] = await Promise.all([
+  const [jobs, myApps, me] = await Promise.all([
     db.jobPosting.findMany({
       where: { status: "OPEN" },
       orderBy: { createdAt: "desc" },
@@ -42,6 +42,7 @@ export default async function JobsPage() {
       include: { job: { select: { title: true, department: true } } },
       orderBy: { createdAt: "desc" },
     }),
+    db.user.findUnique({ where: { id: user.id }, select: { cvUrl: true } }),
   ]);
 
   const appliedMap = new Map(myApps.map((a) => [a.jobId, a.status]));
@@ -120,7 +121,7 @@ export default async function JobsPage() {
                       {status.replace("_", " ")}
                     </Badge>
                   ) : (
-                    <ApplyButton jobId={job.id} />
+                    <ApplyButton jobId={job.id} cvOnFile={me?.cvUrl} />
                   )}
                 </div>
               </div>

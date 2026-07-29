@@ -19,6 +19,7 @@ import {
   ClipboardCheck,
   ClipboardList,
   Video,
+  Library,
   type LucideIcon,
 } from "lucide-react";
 import { clsx } from "@/lib/cn";
@@ -42,6 +43,7 @@ const ICONS: Record<string, LucideIcon> = {
   onboarding: ClipboardCheck,
   interview: Video,
   work: ClipboardList,
+  catalog: Library,
 };
 
 export function SidebarNav({ items }: { items: NavItem[] }) {

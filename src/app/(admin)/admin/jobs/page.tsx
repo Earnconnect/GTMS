@@ -22,7 +22,7 @@ export default async function AdminJobsPage() {
     include: {
       applications: {
         orderBy: { createdAt: "desc" },
-        include: { applicant: { select: { name: true, email: true } }, interview: true },
+        include: { applicant: { select: { name: true, email: true, cvUrl: true } }, interview: true },
       },
     },
   });
@@ -74,6 +74,16 @@ export default async function AdminJobsPage() {
                             {a.applicant.name ?? a.applicant.email}
                           </p>
                           {a.coverNote && <p className="truncate text-xs text-slate-400">{a.coverNote}</p>}
+                          {a.applicant.cvUrl && (
+                            <a
+                              href={a.applicant.cvUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs font-medium text-brand-600 hover:underline"
+                            >
+                              View CV →
+                            </a>
+                          )}
                         </div>
                         <Badge tone={APP_TONE[a.status]}>{a.status.replace("_", " ")}</Badge>
                       </div>

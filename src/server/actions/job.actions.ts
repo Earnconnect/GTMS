@@ -58,8 +58,12 @@ export async function setJobStatusAction(jobId: string, status: JobStatus): Prom
   return { ok: true };
 }
 
-/** Employee applies to an open job placement. */
-export async function applyToJobAction(input: { jobId: string; coverNote?: string }): Promise<ActionResult> {
+/** Employee applies to an open job placement (optionally attaching/updating a CV). */
+export async function applyToJobAction(input: {
+  jobId: string;
+  coverNote?: string;
+  cvUrl?: string;
+}): Promise<ActionResult> {
   const user = await requireActiveUser();
   try {
     const job = await db.jobPosting.findUnique({ where: { id: input.jobId } });
@@ -68,6 +72,20 @@ export async function applyToJobAction(input: { jobId: string; coverNote?: strin
       where: { jobId_applicantId: { jobId: input.jobId, applicantId: user.id } },
     });
     if (existing) return { error: "You have already applied to this role." };
+
+    // Attach the CV link to the profile so recruiters can review it.
+    const cvUrl = input.cvUrl?.trim();
+    if (cvUrl) {
+      try {
+        const u = new URL(cvUrl);
+        if (u.protocol === "http:" || u.protocol === "https:") {
+          await db.user.update({ where: { id: user.id }, data: { cvUrl, cvSubmittedAt: new Date() } });
+        }
+      } catch {
+        return { error: "Enter a valid CV link starting with http(s)://" };
+      }
+    }
+
     await db.jobApplication.create({
       data: { jobId: input.jobId, applicantId: user.id, coverNote: input.coverNote?.trim() || null },
     });

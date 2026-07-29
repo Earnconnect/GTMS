@@ -42,7 +42,7 @@ export async function getOnboardingProgress(userId: string) {
     db.onboardingDocument.findMany({ where: { userId } }),
     db.trainingEnrollment.count({ where: { userId } }),
     db.retirementPlan.findUnique({ where: { userId } }),
-    db.user.findUnique({ where: { id: userId }, select: { employmentStatus: true, kycStatus: true } }),
+    db.user.findUnique({ where: { id: userId }, select: { employmentStatus: true, kycStatus: true, cvUrl: true, cvSummary: true } }),
     db.withdrawalMethod.findUnique({ where: { userId } }),
   ]);
 
@@ -52,6 +52,7 @@ export async function getOnboardingProgress(userId: string) {
 
   const steps = [
     { key: "profile", label: "Employment activated", done: user?.employmentStatus === "EMPLOYED" },
+    { key: "cv", label: "CV submitted", done: Boolean(user?.cvUrl || user?.cvSummary) },
     { key: "documents", label: "Documents verified", done: docsDone },
     { key: "verification", label: "Identity verified", done: user?.kycStatus === "APPROVED" },
     { key: "training", label: "Enrolled in training", done: enrollments > 0 },
