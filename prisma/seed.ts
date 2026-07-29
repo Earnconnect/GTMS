@@ -170,6 +170,44 @@ async function main() {
     if (!exists) await db.jobPosting.create({ data: { ...j, status: "OPEN", postedById: admin.id } });
   }
 
+  // Realistic assignment catalog — ready-made work tagged by role/job family.
+  const templates: {
+    title: string;
+    brief: string;
+    role: string;
+    department: string;
+    estimatedHours: number;
+    difficulty: string;
+  }[] = [
+    // Customer Support
+    { role: "Customer Support", department: "Operations", difficulty: "Easy", estimatedHours: 4, title: "Clear the inbound support queue", brief: "Work through the 15 oldest open tickets in the inbound queue. Respond in a warm, clear tone, resolve what you can, and escalate anything that needs a specialist with a clean summary. Log the outcome on each ticket." },
+    { role: "Customer Support", department: "Operations", difficulty: "Medium", estimatedHours: 5, title: "Resolve the escalations backlog", brief: "Review the 8 escalated tickets assigned to you. Reproduce the issue, coordinate with the right team, and drive each to resolution. Post a short root-cause note on every ticket you close." },
+    { role: "Customer Support", department: "Operations", difficulty: "Easy", estimatedHours: 3, title: "Refresh 5 help-center articles", brief: "Using themes from recent tickets, update or draft 5 help-center FAQ articles. Keep them concise, accurate, and skimmable. Submit the links to the updated articles." },
+    { role: "Customer Support", department: "Operations", difficulty: "Medium", estimatedHours: 4, title: "Live chat coverage — 4-hour shift", brief: "Cover the live chat queue for a 4-hour block. Keep first-response time under 2 minutes, resolve or route each chat, and note any recurring problems you spot for the team." },
+    // Quality Assurance
+    { role: "Quality Assurance", department: "Quality", difficulty: "Medium", estimatedHours: 4, title: "Audit 20 resolved tickets", brief: "Score 20 recently resolved tickets against the QA rubric (accuracy, tone, resolution). Flag any that miss the bar with a specific reason, and summarize the top 3 improvement themes." },
+    { role: "Quality Assurance", department: "Quality", difficulty: "Hard", estimatedHours: 6, title: "Weekly QA calibration report", brief: "Sample resolved work across the team, apply the rubric consistently, and compile a calibration report with scores, examples, and coaching recommendations. Submit the report." },
+    // Operations
+    { role: "Operations", department: "Operations", difficulty: "Easy", estimatedHours: 2, title: "Complete the daily operations checklist", brief: "Run the opening operations checklist across all systems: confirm queues are healthy, integrations are green, and overnight jobs succeeded. Note and escalate any anomalies." },
+    { role: "Operations", department: "Operations", difficulty: "Medium", estimatedHours: 4, title: "Reconcile the weekly vendor report", brief: "Reconcile this week's vendor report against internal records. Identify discrepancies, document each with evidence, and propose corrections. Submit a summary of what you found." },
+    { role: "Operations", department: "Operations", difficulty: "Medium", estimatedHours: 5, title: "Process 30 order verifications", brief: "Review and verify 30 pending orders against our checklist (details, eligibility, flags). Approve the clean ones, hold the exceptions with a reason, and summarize the batch." },
+    // Data
+    { role: "Data", department: "Data", difficulty: "Easy", estimatedHours: 3, title: "Label 100 product images", brief: "Categorize 100 product images per the labeling taxonomy. Apply the closest category and main-object label, skip anything unclear with a note, and keep accuracy above the 95% bar." },
+    { role: "Data", department: "Data", difficulty: "Medium", estimatedHours: 4, title: "Clean the contacts dataset", brief: "Deduplicate and standardize the contacts dataset: normalize names, fix formatting, merge duplicates, and drop invalid rows. Submit a before/after record count and notes on your rules." },
+    // Sales / CRM
+    { role: "Sales", department: "Growth", difficulty: "Medium", estimatedHours: 4, title: "Follow up with 25 warm leads", brief: "Reach out to 25 warm leads in the CRM using the approved outreach template. Personalize the first line, log every touch, and book demos where there's interest. Report replies and meetings booked." },
+    // Content
+    { role: "Content", department: "Marketing", difficulty: "Medium", estimatedHours: 5, title: "Draft 3 blog posts from the content brief", brief: "Write 3 short blog posts (500–700 words) from the provided briefs. Match our voice, include a clear takeaway, and add suggested titles. Submit the drafts for editorial review." },
+    // General / onboarding
+    { role: "General", department: "People", difficulty: "Easy", estimatedHours: 2, title: "Complete your onboarding checklist", brief: "Finish every step in your onboarding: verify documents, set up your tools, and complete New-Hire Orientation. Submit a note confirming each item is done." },
+    { role: "General", department: "People", difficulty: "Easy", estimatedHours: 3, title: "Shadow a senior teammate", brief: "Shadow a senior teammate for a session, take notes on how they handle real work, and write a short reflection on 3 things you learned and 1 question you still have." },
+    { role: "General", department: "People", difficulty: "Medium", estimatedHours: 4, title: "Write your 30-day plan", brief: "Draft your first 30-day plan: goals, the skills you'll build, and how you'll measure progress. Keep it concrete and submit it for your manager's feedback." },
+  ];
+  for (const t of templates) {
+    const exists = await db.assignmentTemplate.findFirst({ where: { title: t.title } });
+    if (!exists) await db.assignmentTemplate.create({ data: t });
+  }
+
   // Demo: employee applies to a role and has an interview scheduled.
   const firstJob = await db.jobPosting.findFirst({ orderBy: { createdAt: "asc" } });
   if (firstJob) {

@@ -16,7 +16,7 @@ const STATUS_TONE: Record<string, "gray" | "yellow" | "blue" | "green" | "red"> 
 export default async function AdminAssignmentsPage() {
   await requireRole("ADMIN");
 
-  const [assignments, employees, jobs] = await Promise.all([
+  const [assignments, employees, jobs, templates] = await Promise.all([
     db.jobAssignment.findMany({
       orderBy: [{ status: "asc" }, { createdAt: "desc" }],
       take: 200,
@@ -25,9 +25,14 @@ export default async function AdminAssignmentsPage() {
     db.user.findMany({
       where: { employmentStatus: { not: null }, email: { not: SYSTEM_USER_EMAIL } },
       orderBy: { name: "asc" },
-      select: { id: true, name: true, email: true },
+      select: { id: true, name: true, email: true, jobTitle: true, department: true },
     }),
     db.jobPosting.findMany({ orderBy: { createdAt: "desc" }, select: { id: true, title: true } }),
+    db.assignmentTemplate.findMany({
+      where: { active: true },
+      orderBy: [{ role: "asc" }, { title: "asc" }],
+      select: { id: true, title: true, brief: true, role: true, department: true, estimatedHours: true, difficulty: true },
+    }),
   ]);
 
   const submitted = assignments.filter((a) => a.status === "SUBMITTED").length;
@@ -44,8 +49,11 @@ export default async function AdminAssignmentsPage() {
         <StatCard label="Completed" value={completed} icon={<ClipboardList className="h-5 w-5" />} tone="emerald" />
       </div>
 
-      <SectionCard title="Assign work" description="Give an employee a job to start doing.">
-        <AssignForm employees={employees} jobs={jobs} />
+      <SectionCard
+        title="Assign work"
+        description={`Pick from ${templates.length} ready-made assignments matched to the employee's role, or write your own.`}
+      >
+        <AssignForm employees={employees} jobs={jobs} templates={templates} />
       </SectionCard>
 
       {assignments.length === 0 ? (

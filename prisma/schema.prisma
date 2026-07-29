@@ -605,6 +605,22 @@ enum WorkStatus {
   CANCELLED
 }
 
+// A reusable, ready-made assignment tagged by the role/job family it suits.
+// Admins pick one that matches an employee's role and assign it.
+model AssignmentTemplate {
+  id             String   @id @default(cuid())
+  title          String
+  brief          String
+  role           String   @default("General")
+  department     String?
+  estimatedHours Int      @default(4)
+  difficulty     String   @default("Medium")
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  @@index([role])
+}
+
 // A job an employee is actively assigned to work on (after placement/assignment).
 model JobAssignment {
   id             String      @id @default(cuid())
