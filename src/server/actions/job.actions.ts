@@ -95,6 +95,30 @@ export async function decideApplicationAction(input: {
       body: `Your application for "${app.job.title}" is now ${input.status.replace("_", " ").toLowerCase()}.`,
       link: "/jobs",
     });
+
+    // On placement, create a work assignment so the employee has something to
+    // start doing — unless one already exists for this job.
+    if (input.status === "PLACED") {
+      const existing = await db.jobAssignment.findFirst({
+        where: { employeeId: app.applicantId, jobId: app.jobId },
+      });
+      if (!existing) {
+        await db.jobAssignment.create({
+          data: {
+            employeeId: app.applicantId,
+            jobId: app.jobId,
+            title: app.job.title,
+            brief: app.job.responsibilities?.trim() || app.job.description,
+            assignedById: admin.id,
+          },
+        });
+        await notify(app.applicantId, "SYSTEM", "You've been placed!", {
+          body: `Congratulations — you're placed as ${app.job.title}. Your first assignment is ready.`,
+          link: "/assignments",
+        });
+        revalidatePath("/assignments");
+      }
+    }
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Could not update application" };
   }

@@ -17,6 +17,7 @@ import {
   GraduationCap,
   FileWarning,
   ClipboardCheck,
+  ClipboardList,
   Video,
   type LucideIcon,
 } from "lucide-react";
@@ -40,6 +41,7 @@ const ICONS: Record<string, LucideIcon> = {
   reports: FileWarning,
   onboarding: ClipboardCheck,
   interview: Video,
+  work: ClipboardList,
 };
 
 export function SidebarNav({ items }: { items: NavItem[] }) {

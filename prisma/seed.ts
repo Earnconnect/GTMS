@@ -201,6 +201,21 @@ async function main() {
     }
   }
 
+  // Demo: a work assignment the employee can start doing.
+  const hasAssignment = await db.jobAssignment.findFirst({ where: { employeeId: employee.id } });
+  if (!hasAssignment) {
+    await db.jobAssignment.create({
+      data: {
+        employeeId: employee.id,
+        jobId: firstJob?.id ?? null,
+        title: "Onboarding task — clear your first support queue",
+        brief:
+          "Work through 10 sample support tickets in the practice queue. Respond with the right tone, resolve or escalate each one, and note anything unclear. When you're done, submit a short summary of how it went.",
+        assignedById: admin.id,
+      },
+    });
+  }
+
   // Onboarding documents + retirement plan for the active employee
   const DEFAULT_DOCS = [
     { docType: "government_id", label: "Government-issued photo ID", required: true },

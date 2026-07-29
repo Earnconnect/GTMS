@@ -7,8 +7,8 @@ import {
   ArrowRight,
   Briefcase,
   ClipboardCheck,
+  ClipboardList,
   GraduationCap,
-  FileWarning,
 } from "lucide-react";
 import { requireRole } from "@/server/rbac";
 import { db } from "@/server/db";
@@ -18,10 +18,10 @@ import { listSalaryPayments } from "@/server/services/payroll.service";
 import { getOnboardingProgress } from "@/server/services/onboarding.service";
 
 const QUICK_LINKS = [
+  { href: "/assignments", label: "My work", desc: "Assigned jobs", icon: ClipboardList },
   { href: "/onboarding", label: "Onboarding", desc: "Documents & 401(k)", icon: ClipboardCheck },
   { href: "/jobs", label: "Job placements", desc: "Browse & apply", icon: Briefcase },
   { href: "/training", label: "Bootcamp", desc: "Courses & progress", icon: GraduationCap },
-  { href: "/reports", label: "Reports", desc: "Submit an update", icon: FileWarning },
 ];
 
 export default async function EmployeeDashboard() {

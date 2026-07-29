@@ -3,6 +3,7 @@ import { AppShell, type NavItem } from "@/components/layout/AppShell";
 
 const WORKER_NAV: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
+  { href: "/assignments", label: "My work", icon: "work" },
   { href: "/onboarding", label: "Onboarding", icon: "onboarding" },
   { href: "/jobs", label: "Job placements", icon: "jobs" },
   { href: "/interviews", label: "Interviews", icon: "interview" },

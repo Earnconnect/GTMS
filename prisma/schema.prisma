@@ -194,6 +194,7 @@ model User {
   documents        OnboardingDocument[]
   retirementPlan   RetirementPlan?
   withdrawalMethod WithdrawalMethod?
+  workAssignments  JobAssignment[]      @relation("EmployeeWork")
 
   // Stripe Connect account ID (workers only — used as payout destination)
   stripeConnectId String?
@@ -589,9 +590,42 @@ model JobPosting {
   postedById       String
   postedBy         User             @relation("JobPoster", fields: [postedById], references: [id])
   applications     JobApplication[]
+  assignments      JobAssignment[]
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
+  @@index([status])
+}
+
+enum WorkStatus {
+  ASSIGNED
+  IN_PROGRESS
+  SUBMITTED
+  COMPLETED
+  CANCELLED
+}
+
+// A job an employee is actively assigned to work on (after placement/assignment).
+model JobAssignment {
+  id             String      @id @default(cuid())
+  employeeId     String
+  employee       User        @relation("EmployeeWork", fields: [employeeId], references: [id], onDelete: Cascade)
+  jobId          String?
+  job            JobPosting? @relation(fields: [jobId], references: [id])
+  title          String
+  brief          String
+  status         WorkStatus  @default(ASSIGNED)
+  assignedById   String
+  dueAt          DateTime?
+  startedAt      DateTime?
+  submittedAt    DateTime?
+  completedAt    DateTime?
+  submissionNote String?
+  reviewNote     String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([employeeId, status])
   @@index([status])
 }
 
