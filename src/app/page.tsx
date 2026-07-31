@@ -42,9 +42,9 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen bg-[var(--background)]">
       <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <Logo />
-          <nav className="flex items-center gap-2">
+          <nav className="flex items-center gap-1 sm:gap-2">
             <Link
               href="/login"
               className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900"

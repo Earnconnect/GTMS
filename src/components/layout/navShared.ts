@@ -1,0 +1,42 @@
+import {
+  LayoutDashboard,
+  Users,
+  UserPlus,
+  Wallet,
+  BadgeCheck,
+  LifeBuoy,
+  BarChart3,
+  ArrowDownToLine,
+  BookOpenCheck,
+  ShieldCheck,
+  Briefcase,
+  GraduationCap,
+  FileWarning,
+  ClipboardCheck,
+  ClipboardList,
+  Video,
+  Library,
+  type LucideIcon,
+} from "lucide-react";
+
+export type NavItem = { href: string; label: string; icon?: string };
+
+export const NAV_ICONS: Record<string, LucideIcon> = {
+  dashboard: LayoutDashboard,
+  users: Users,
+  onboard: UserPlus,
+  wallet: Wallet,
+  verify: BadgeCheck,
+  support: LifeBuoy,
+  analytics: BarChart3,
+  withdrawals: ArrowDownToLine,
+  ledger: BookOpenCheck,
+  shield: ShieldCheck,
+  jobs: Briefcase,
+  training: GraduationCap,
+  reports: FileWarning,
+  onboarding: ClipboardCheck,
+  interview: Video,
+  work: ClipboardList,
+  catalog: Library,
+};

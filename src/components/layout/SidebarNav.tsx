@@ -2,49 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Users,
-  UserPlus,
-  Wallet,
-  BadgeCheck,
-  LifeBuoy,
-  BarChart3,
-  ArrowDownToLine,
-  BookOpenCheck,
-  ShieldCheck,
-  Briefcase,
-  GraduationCap,
-  FileWarning,
-  ClipboardCheck,
-  ClipboardList,
-  Video,
-  Library,
-  type LucideIcon,
-} from "lucide-react";
 import { clsx } from "@/lib/cn";
+import { NAV_ICONS, type NavItem } from "./navShared";
 
-export type NavItem = { href: string; label: string; icon?: string };
-
-const ICONS: Record<string, LucideIcon> = {
-  dashboard: LayoutDashboard,
-  users: Users,
-  onboard: UserPlus,
-  wallet: Wallet,
-  verify: BadgeCheck,
-  support: LifeBuoy,
-  analytics: BarChart3,
-  withdrawals: ArrowDownToLine,
-  ledger: BookOpenCheck,
-  shield: ShieldCheck,
-  jobs: Briefcase,
-  training: GraduationCap,
-  reports: FileWarning,
-  onboarding: ClipboardCheck,
-  interview: Video,
-  work: ClipboardList,
-  catalog: Library,
-};
+export type { NavItem };
 
 export function SidebarNav({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
@@ -55,7 +16,7 @@ export function SidebarNav({ items }: { items: NavItem[] }) {
         const active =
           pathname === item.href ||
           (item.href !== "/" && pathname.startsWith(item.href + "/"));
-        const Icon = item.icon ? ICONS[item.icon] : undefined;
+        const Icon = item.icon ? NAV_ICONS[item.icon] : undefined;
         return (
           <Link
             key={item.href}

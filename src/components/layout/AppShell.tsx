@@ -5,6 +5,7 @@ import { Wallet, LogOut } from "lucide-react";
 import { logoutAction } from "@/server/actions/logout.action";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { SidebarNav, type NavItem } from "@/components/layout/SidebarNav";
+import { MobileNav } from "@/components/layout/MobileNav";
 import { Avatar } from "@/components/ui";
 
 export type { NavItem };
@@ -56,8 +57,9 @@ export function AppShell({
       </aside>
 
       <div className="md:pl-64">
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white/80 px-4 backdrop-blur sm:px-6">
-          <div className="flex items-center gap-3">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white/80 px-3 backdrop-blur sm:px-6">
+          <div className="flex items-center gap-1.5">
+            <MobileNav nav={nav} user={user} roleLabel={roleLabel[user.role]} />
             <span className="md:hidden">
               <Logo />
             </span>
