@@ -52,7 +52,14 @@ export default async function AdminOnboardingPage() {
                   <div>
                     <p className="text-sm font-medium text-slate-800">{d.label}</p>
                     <p className="text-xs text-slate-400">
-                      {d.user.name ?? d.user.email} · {d.fileName ?? "—"}
+                      {d.user.name ?? d.user.email} ·{" "}
+                      {d.fileUrl ? (
+                        <a href={`/api/document/${d.id}`} target="_blank" rel="noopener noreferrer" className="font-medium text-brand-600 hover:underline">
+                          View file →
+                        </a>
+                      ) : (
+                        d.fileName ?? "—"
+                      )}
                     </p>
                   </div>
                 </div>

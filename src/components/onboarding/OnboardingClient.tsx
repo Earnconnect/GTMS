@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { DocStatus } from "@prisma/client";
-import { FileText, CheckCircle2, Clock, XCircle, Upload, PiggyBank } from "lucide-react";
-import { submitDocumentAction, updateRetirementAction } from "@/server/actions/onboarding.actions";
+import { FileText, CheckCircle2, Clock, XCircle, Upload, PiggyBank, ExternalLink, Loader2 } from "lucide-react";
+import { submitDocumentAction, uploadDocumentAction, updateRetirementAction } from "@/server/actions/onboarding.actions";
 import { Badge, Button, Input } from "@/components/ui";
 import { formatMoney } from "@/lib/money";
 
@@ -17,13 +17,17 @@ const DOC_TONE: Record<DocStatus, { tone: "gray" | "yellow" | "green" | "red"; i
 
 export function DocumentRow({
   doc,
+  uploadEnabled,
 }: {
-  doc: { id: string; label: string; required: boolean; status: DocStatus; fileName: string | null; note: string | null };
+  doc: { id: string; label: string; required: boolean; status: DocStatus; fileName: string | null; fileUrl: string | null; note: string | null };
+  uploadEnabled: boolean;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
+  const [uploading, setUploading] = useState(false);
   const [fileName, setFileName] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const meta = DOC_TONE[doc.status];
   const Icon = meta.icon;
 
@@ -35,6 +39,21 @@ export function DocumentRow({
       if (res.error) setError(res.error);
       else router.refresh();
     });
+  }
+
+  async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError(null);
+    setUploading(true);
+    const fd = new FormData();
+    fd.set("documentId", doc.id);
+    fd.set("file", file);
+    const res = await uploadDocumentAction(fd);
+    setUploading(false);
+    if (res.error) setError(res.error);
+    else router.refresh();
+    if (fileRef.current) fileRef.current.value = "";
   }
 
   const canSubmit = doc.status === "NOT_SUBMITTED" || doc.status === "REJECTED";
@@ -50,7 +69,17 @@ export function DocumentRow({
             {doc.label}
             {!doc.required && <span className="ml-2 text-xs font-normal text-slate-400">Optional</span>}
           </p>
-          {doc.fileName && <p className="text-xs text-slate-400">{doc.fileName}</p>}
+          {doc.fileName && (
+            <p className="text-xs text-slate-400">
+              {doc.fileUrl ? (
+                <a href={`/api/document/${doc.id}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-brand-600 hover:underline">
+                  <ExternalLink className="h-3 w-3" /> {doc.fileName}
+                </a>
+              ) : (
+                doc.fileName
+              )}
+            </p>
+          )}
           {doc.status === "REJECTED" && doc.note && (
             <p className="text-xs text-red-500">Reviewer: {doc.note}</p>
           )}
@@ -60,7 +89,22 @@ export function DocumentRow({
         <Badge tone={meta.tone}>
           <Icon className="h-3 w-3" /> {meta.label}
         </Badge>
-        {canSubmit && (
+        {canSubmit && uploadEnabled && (
+          <>
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,application/pdf"
+              onChange={onFileChange}
+              disabled={uploading || pending}
+              className="hidden"
+            />
+            <Button size="sm" disabled={uploading || pending} onClick={() => fileRef.current?.click()} className="gap-1">
+              {uploading ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Uploading…</> : <><Upload className="h-3.5 w-3.5" /> Upload</>}
+            </Button>
+          </>
+        )}
+        {canSubmit && !uploadEnabled && (
           <div className="flex items-center gap-2">
             <Input
               value={fileName}

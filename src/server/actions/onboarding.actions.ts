@@ -1,12 +1,55 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { put } from "@vercel/blob";
 import { requireActiveUser, requireRole } from "@/server/rbac";
 import { db } from "@/server/db";
 import { ensureRetirementPlan } from "@/server/services/onboarding.service";
 import { notify } from "@/server/services/notification.service";
+import { isUploadEnabled } from "@/server/uploads";
 
 export type ActionResult = { error?: string; ok?: boolean };
+
+const MAX_DOC_BYTES = 8 * 1024 * 1024;
+const DOC_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "image/png",
+  "image/jpeg",
+];
+
+/** Employee uploads an actual document file (private Blob), e.g. their 401(k) form. */
+export async function uploadDocumentAction(formData: FormData): Promise<ActionResult> {
+  const user = await requireActiveUser();
+  if (!isUploadEnabled()) return { error: "File upload is not configured." };
+
+  const documentId = String(formData.get("documentId") ?? "");
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) return { error: "Choose a file to upload." };
+  if (file.size > MAX_DOC_BYTES) return { error: "File must be under 8 MB." };
+  if (!DOC_TYPES.includes(file.type)) return { error: "Upload a PDF, Word document, or image." };
+
+  const doc = await db.onboardingDocument.findUnique({ where: { id: documentId } });
+  if (!doc || doc.userId !== user.id) return { error: "Document not found." };
+
+  try {
+    const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-60) || "document";
+    const blob = await put(`documents/${user.id}/${doc.docType}/${safe}`, file, {
+      access: "private",
+      addRandomSuffix: true,
+    });
+    await db.onboardingDocument.update({
+      where: { id: documentId },
+      data: { status: "SUBMITTED", fileUrl: blob.url, fileName: file.name, note: null },
+    });
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Upload failed." };
+  }
+  revalidatePath("/onboarding");
+  revalidatePath("/admin/onboarding");
+  return { ok: true };
+}
 
 /** Employee marks a document as submitted (records a filename label only). */
 export async function submitDocumentAction(input: {

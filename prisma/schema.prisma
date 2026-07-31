@@ -787,6 +787,7 @@ model OnboardingDocument {
   required     Boolean   @default(true)
   status       DocStatus @default(NOT_SUBMITTED)
   fileName     String?
+  fileUrl      String?
   note         String?
   reviewedById String?
   reviewedAt   DateTime?

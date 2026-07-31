@@ -90,7 +90,7 @@ export default async function OnboardingPage() {
           >
             <div className="divide-y divide-slate-100">
               {progress.docs.map((doc) => (
-                <DocumentRow key={doc.id} doc={doc} />
+                <DocumentRow key={doc.id} doc={doc} uploadEnabled={isUploadEnabled()} />
               ))}
             </div>
           </SectionCard>

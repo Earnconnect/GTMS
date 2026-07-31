@@ -11,6 +11,7 @@ export const DEFAULT_DOCUMENTS: { docType: string; label: string; required: bool
   { docType: "tax_form", label: "Tax form (W-4 or local equivalent)", required: true },
   { docType: "signed_offer", label: "Signed offer letter", required: true },
   { docType: "direct_deposit", label: "Direct deposit authorization", required: false },
+  { docType: "retirement_401k", label: "401(k) enrollment / beneficiary form", required: false },
 ];
 
 /** Idempotently create the document checklist rows for a user. */
