@@ -14,17 +14,45 @@ export const DEFAULT_DOCUMENTS: { docType: string; label: string; required: bool
   { docType: "retirement_401k", label: "401(k) enrollment / beneficiary form", required: false },
 ];
 
-/** Idempotently create the document checklist rows for a user. */
+/**
+ * Idempotently create the document checklist rows for a user, driven by the
+ * admin-managed DocumentRequirement catalog. Falls back to the built-in
+ * defaults if the catalog hasn't been populated yet.
+ */
 export async function ensureOnboardingDocuments(userId: string) {
+  const reqs = await db.documentRequirement.findMany({
+    where: { active: true },
+    orderBy: { order: "asc" },
+  });
+  const source = reqs.length ? reqs : DEFAULT_DOCUMENTS;
+
   const existing = await db.onboardingDocument.findMany({ where: { userId } });
   const have = new Set(existing.map((d) => d.docType));
-  const missing = DEFAULT_DOCUMENTS.filter((d) => !have.has(d.docType));
+  const missing = source.filter((d) => !have.has(d.docType));
   if (missing.length) {
     await db.onboardingDocument.createMany({
       data: missing.map((d) => ({ userId, docType: d.docType, label: d.label, required: d.required })),
+      skipDuplicates: true,
     });
   }
   return db.onboardingDocument.findMany({ where: { userId }, orderBy: { createdAt: "asc" } });
+}
+
+/** Seed the requirement catalog from the built-in defaults if it's empty. */
+export async function ensureDocumentRequirements() {
+  const count = await db.documentRequirement.count();
+  if (count === 0) {
+    await db.documentRequirement.createMany({
+      data: DEFAULT_DOCUMENTS.map((d, i) => ({
+        docType: d.docType,
+        label: d.label,
+        required: d.required,
+        order: i,
+      })),
+      skipDuplicates: true,
+    });
+  }
+  return db.documentRequirement.findMany({ orderBy: { order: "asc" } });
 }
 
 /** Idempotently create a (not-enrolled) retirement plan for a user. */

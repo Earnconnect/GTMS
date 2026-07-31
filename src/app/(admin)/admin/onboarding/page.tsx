@@ -3,6 +3,8 @@ import { requireRole } from "@/server/rbac";
 import { db } from "@/server/db";
 import { PageHeader, Badge, SectionCard, StatCard, Avatar, EmptyState } from "@/components/ui";
 import { DocumentReview } from "@/components/admin/DocumentReview";
+import { DocumentRequirements } from "@/components/admin/DocumentRequirements";
+import { ensureDocumentRequirements } from "@/server/services/onboarding.service";
 
 const DOC_TONE: Record<string, "gray" | "yellow" | "green" | "red"> = {
   NOT_SUBMITTED: "gray",
@@ -13,6 +15,8 @@ const DOC_TONE: Record<string, "gray" | "yellow" | "green" | "red"> = {
 
 export default async function AdminOnboardingPage() {
   await requireRole("ADMIN");
+
+  const requirements = await ensureDocumentRequirements();
 
   const [pending, verifiedCount, all] = await Promise.all([
     db.onboardingDocument.findMany({
@@ -37,6 +41,13 @@ export default async function AdminOnboardingPage() {
         <StatCard label="Verified" value={verifiedCount} icon={<ShieldCheck className="h-5 w-5" />} tone="emerald" />
         <StatCard label="Documents total" value={all.length} icon={<FileText className="h-5 w-5" />} tone="slate" />
       </div>
+
+      <SectionCard
+        title="Required documents"
+        description="Add documents every employee must submit, or mark them optional. Changes apply to all employees."
+      >
+        <DocumentRequirements requirements={requirements} />
+      </SectionCard>
 
       <SectionCard title="Awaiting review" description="Submitted documents that need verification.">
         {pending.length === 0 ? (

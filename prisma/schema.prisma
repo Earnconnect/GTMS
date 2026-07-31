@@ -778,6 +778,18 @@ model JobReport {
 
 // ---- Onboarding document verification ----
 
+// Admin-managed catalog of documents every employee is asked to submit.
+model DocumentRequirement {
+  id          String   @id @default(cuid())
+  docType     String   @unique
+  label       String
+  description String?
+  required    Boolean  @default(true)
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
 model OnboardingDocument {
   id           String    @id @default(cuid())
   userId       String
