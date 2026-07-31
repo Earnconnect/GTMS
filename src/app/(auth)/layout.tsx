@@ -27,17 +27,17 @@ export default function AuthLayout({
 
         <div className="relative">
           <h2 className="max-w-md text-3xl font-semibold leading-tight">
-            Get recruited, get to work, get paid.
+            One platform for your entire team.
           </h2>
           <p className="mt-3 max-w-sm text-white/80">
-            GTMS is where teams onboard talent and run payroll — and where you
-            receive your salary and withdraw it, safely.
+            Recruiting, onboarding, training, and payroll — a seamless experience
+            from application to paycheck.
           </p>
           <ul className="mt-8 space-y-3 text-sm text-white/90">
             {[
-              [BadgeCheck, "Free to apply and join — no deposits, ever"],
-              [Banknote, "Salary paid straight to your in-app wallet"],
-              [ShieldCheck, "Withdraw your earnings whenever you like"],
+              [BadgeCheck, "Guided onboarding and document verification"],
+              [Banknote, "Salaries paid directly to your wallet"],
+              [ShieldCheck, "Withdraw your earnings on your terms"],
             ].map(([Icon, text]) => (
               <li key={text as string} className="flex items-center gap-3">
                 <span className="grid h-7 w-7 place-items-center rounded-full bg-white/15">

@@ -116,7 +116,7 @@ export function WithdrawalMethodForm({
       </div>
       <p className="flex items-center gap-1.5 text-xs text-slate-400 sm:col-span-2">
         <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
-        For your security we store only the last 4 digits. Payouts are simulated in this environment.
+        For your security, only the last 4 digits of your account are stored.
       </p>
     </form>
   );

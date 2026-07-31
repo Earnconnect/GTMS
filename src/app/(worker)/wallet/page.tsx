@@ -50,7 +50,7 @@ export default async function WorkerWalletPage({
     <div className="space-y-6">
       <PageHeader
         title="Pay & wallet"
-        subtitle="Your salary and withdrawals. Withdraw any time above the minimum — no fees, no unlocks."
+        subtitle="Track your earnings and withdraw to your preferred method."
       />
 
       {sp.stripe_connected === "1" && (

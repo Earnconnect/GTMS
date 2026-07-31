@@ -7,7 +7,7 @@ type Size = "sm" | "md" | "lg";
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    "bg-brand-600 text-white shadow-sm hover:bg-brand-700 focus-visible:outline-brand-600 disabled:bg-brand-300",
+    "bg-brand-gradient text-white shadow-glow hover:brightness-110 focus-visible:outline-brand-600 disabled:opacity-60 disabled:shadow-none",
   success:
     "bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 disabled:bg-emerald-300",
   secondary:
@@ -127,19 +127,20 @@ export function StatCard({
     slate: "bg-slate-100 text-slate-600",
   };
   return (
-    <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-card transition-shadow hover:shadow-card-hover">
-      <div className="flex items-center justify-between">
+    <div className="group relative overflow-hidden rounded-2xl border border-slate-200/70 bg-white p-5 shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card-hover">
+      <div className="pointer-events-none absolute -right-8 -top-10 h-24 w-24 rounded-full bg-brand-100/40 blur-2xl transition-opacity duration-300 group-hover:opacity-80" />
+      <div className="relative flex items-center justify-between">
         <p className="text-sm font-medium text-slate-500">{label}</p>
         {icon && (
-          <span className={clsx("grid h-9 w-9 place-items-center rounded-lg", iconTones[tone])}>
+          <span className={clsx("grid h-10 w-10 place-items-center rounded-xl shadow-inner-top ring-1 ring-inset ring-white/40", iconTones[tone])}>
             {icon}
           </span>
         )}
       </div>
-      <p className="mt-3 text-2xl font-semibold tracking-tight text-slate-900 tabular-nums">
+      <p className="relative mt-3 text-[1.7rem] font-semibold leading-none tracking-tight text-slate-900 tabular-nums">
         {value}
       </p>
-      {hint && <p className="mt-1 text-xs text-slate-400">{hint}</p>}
+      {hint && <p className="relative mt-1.5 text-xs text-slate-400">{hint}</p>}
     </div>
   );
 }

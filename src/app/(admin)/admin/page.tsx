@@ -106,7 +106,7 @@ export default async function AdminOverview() {
                 <p className="text-2xl font-semibold tracking-tight text-slate-900 tabular-nums">
                   {formatMoney(systemUser?.wallet?.balance ?? 0)}
                 </p>
-                <p className="text-xs text-slate-400">Simulated balance</p>
+                <p className="text-xs text-slate-400">Available to fund payroll</p>
               </div>
             </div>
           </SectionCard>

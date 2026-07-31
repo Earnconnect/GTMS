@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { requireRole } from "@/server/rbac";
 import { db } from "@/server/db";
-import { Badge, PageHeader, StatCard, SectionCard, EmptyState, ButtonLink } from "@/components/ui";
+import { Badge, StatCard, SectionCard, EmptyState, ButtonLink } from "@/components/ui";
 import { formatMoney } from "@/lib/money";
 import { listSalaryPayments } from "@/server/services/payroll.service";
 import { getOnboardingProgress } from "@/server/services/onboarding.service";
@@ -50,19 +50,37 @@ export default async function EmployeeDashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={`Welcome${user.name ? `, ${user.name.split(" ")[0]}` : ""}`}
-        subtitle={
-          onboarded
-            ? `${profile?.jobTitle ?? "Employee"}${profile?.department ? ` · ${profile.department}` : ""}`
-            : "Your account is set up. An administrator will complete your onboarding shortly."
-        }
-        action={
-          <ButtonLink href="/onboarding" className="gap-2">
-            <ClipboardCheck className="h-4 w-4" /> Continue onboarding
-          </ButtonLink>
-        }
-      />
+      {/* Premium welcome banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-brand-gradient p-6 text-white shadow-elevated sm:p-8">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10 blur-2xl" />
+        <div className="pointer-events-none absolute inset-0 opacity-15" style={{ backgroundImage: "radial-gradient(circle at 15% 20%, white 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium text-white/70">
+              {onboarded
+                ? `${profile?.jobTitle ?? "Employee"}${profile?.department ? ` · ${profile.department}` : ""}`
+                : "Welcome aboard"}
+            </p>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
+              Welcome{user.name ? `, ${user.name.split(" ")[0]}` : ""}
+            </h1>
+            <p className="mt-2 max-w-md text-sm text-white/80">
+              {onboarded
+                ? "Here's your workspace — track your pay, complete assignments, and keep growing."
+                : "Your account is ready. Our team will complete your onboarding shortly."}
+            </p>
+          </div>
+          <div className="flex items-center gap-3 rounded-2xl bg-white/10 p-4 backdrop-blur">
+            <div>
+              <p className="text-xs text-white/70">Available balance</p>
+              <p className="text-2xl font-bold tabular-nums">{formatMoney(wallet?.balance ?? 0)}</p>
+            </div>
+            <ButtonLink href="/wallet" variant="secondary" size="sm" className="gap-1">
+              Wallet <ArrowRight className="h-3.5 w-3.5" />
+            </ButtonLink>
+          </div>
+        </div>
+      </div>
 
       {!verified && onboarded && (
         <div className="flex items-center gap-3 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-800">

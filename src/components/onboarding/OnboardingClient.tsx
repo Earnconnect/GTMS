@@ -159,7 +159,7 @@ export function RetirementForm({
           <PiggyBank className="h-5 w-5" />
         </span>
         <div>
-          <p className="text-sm font-semibold text-slate-800">{plan.provider}</p>
+          <p className="text-sm font-semibold text-slate-800">GTMS Retirement Plan</p>
           <p className="text-xs text-slate-400">
             {enrolled ? `Enrolled · ${plan.contributionPct}% of salary` : "Not enrolled"}
             {" · "}Employer match up to {plan.employerMatchPct}%
@@ -196,7 +196,7 @@ export function RetirementForm({
           </div>
         </div>
         <p className="mt-2 text-[11px] text-slate-400">
-          Projections are illustrative (simulated plan). No real accounts or funds are involved.
+          Estimates based on your current salary and contribution rate.
         </p>
       </div>
 

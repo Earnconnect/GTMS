@@ -6,6 +6,7 @@ import { logoutAction } from "@/server/actions/logout.action";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { SidebarNav, type NavItem } from "@/components/layout/SidebarNav";
 import { MobileNav } from "@/components/layout/MobileNav";
+import { DemoBadge } from "@/components/layout/DemoBadge";
 import { Avatar } from "@/components/ui";
 
 export type { NavItem };
@@ -41,6 +42,7 @@ export function AppShell({
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-slate-200 bg-white md:flex">
         <div className="flex h-16 items-center justify-between border-b border-slate-100 px-5">
           <Logo />
+          <DemoBadge />
         </div>
         <SidebarNav items={nav} />
         <div className="border-t border-slate-100 p-3">
