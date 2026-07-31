@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Menu, X, Wallet, LogOut } from "lucide-react";
+import { X, Wallet, LogOut, MoreHorizontal, Circle } from "lucide-react";
 import { clsx } from "@/lib/cn";
 import { logoutAction } from "@/server/actions/logout.action";
 import { NAV_ICONS, type NavItem } from "./navShared";
@@ -21,12 +21,10 @@ export function MobileNav({
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  // Close on route change.
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
 
-  // Lock body scroll + close on Escape while open.
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -39,26 +37,52 @@ export function MobileNav({
     };
   }, [open]);
 
+  const isActive = (href: string) =>
+    pathname === href || (href !== "/" && pathname.startsWith(href + "/"));
+
+  const tabs = nav.slice(0, 4);
+  const anyMoreActive = nav.slice(4).some((i) => isActive(i.href));
+
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-label="Open menu"
-        className="grid h-10 w-10 place-items-center rounded-lg text-slate-600 hover:bg-slate-100 md:hidden"
-      >
-        <Menu className="h-5 w-5" />
-      </button>
+      {/* Bottom tab bar — always visible on mobile */}
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex h-16 items-stretch border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_10px_rgba(16,24,40,0.05)] backdrop-blur md:hidden">
+        {tabs.map((item) => {
+          const active = isActive(item.href);
+          const Icon = item.icon ? NAV_ICONS[item.icon] ?? Circle : Circle;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={clsx(
+                "flex flex-1 flex-col items-center justify-center gap-1 text-[11px] font-medium transition-colors",
+                active ? "text-brand-700" : "text-slate-500",
+              )}
+            >
+              <Icon className={clsx("h-[22px] w-[22px]", active ? "text-brand-600" : "text-slate-400")} />
+              <span className="max-w-[74px] truncate">{item.label}</span>
+            </Link>
+          );
+        })}
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="More"
+          className={clsx(
+            "flex flex-1 flex-col items-center justify-center gap-1 text-[11px] font-medium transition-colors",
+            anyMoreActive ? "text-brand-700" : "text-slate-500",
+          )}
+        >
+          <MoreHorizontal className={clsx("h-[22px] w-[22px]", anyMoreActive ? "text-brand-600" : "text-slate-400")} />
+          More
+        </button>
+      </nav>
 
-      {/* Drawer */}
+      {/* Full-menu drawer */}
       <div
-        className={clsx(
-          "fixed inset-0 z-50 md:hidden",
-          open ? "pointer-events-auto" : "pointer-events-none",
-        )}
+        className={clsx("fixed inset-0 z-50 md:hidden", open ? "pointer-events-auto" : "pointer-events-none")}
         aria-hidden={!open}
       >
-        {/* Backdrop */}
         <div
           onClick={() => setOpen(false)}
           className={clsx(
@@ -66,10 +90,9 @@ export function MobileNav({
             open ? "opacity-100" : "opacity-0",
           )}
         />
-        {/* Panel */}
         <div
           className={clsx(
-            "absolute inset-y-0 left-0 flex w-[82%] max-w-xs flex-col bg-white shadow-soft transition-transform duration-300 ease-out",
+            "absolute inset-y-0 left-0 flex w-[84%] max-w-xs flex-col bg-white shadow-soft transition-transform duration-300 ease-out",
             open ? "translate-x-0" : "-translate-x-full",
           )}
         >
@@ -92,9 +115,7 @@ export function MobileNav({
 
           <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
             {nav.map((item) => {
-              const active =
-                pathname === item.href ||
-                (item.href !== "/" && pathname.startsWith(item.href + "/"));
+              const active = isActive(item.href);
               const Icon = item.icon ? NAV_ICONS[item.icon] : undefined;
               return (
                 <Link
@@ -103,19 +124,10 @@ export function MobileNav({
                   onClick={() => setOpen(false)}
                   className={clsx(
                     "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                    active
-                      ? "bg-brand-50 text-brand-700"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+                    active ? "bg-brand-50 text-brand-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
                   )}
                 >
-                  {Icon && (
-                    <Icon
-                      className={clsx(
-                        "h-5 w-5 shrink-0",
-                        active ? "text-brand-600" : "text-slate-400",
-                      )}
-                    />
-                  )}
+                  {Icon && <Icon className={clsx("h-5 w-5 shrink-0", active ? "text-brand-600" : "text-slate-400")} />}
                   {item.label}
                   {active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500" />}
                 </Link>

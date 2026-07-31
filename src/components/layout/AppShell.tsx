@@ -57,9 +57,8 @@ export function AppShell({
       </aside>
 
       <div className="md:pl-64">
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white/80 px-3 backdrop-blur sm:px-6">
-          <div className="flex items-center gap-1.5">
-            <MobileNav nav={nav} user={user} roleLabel={roleLabel[user.role]} />
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white/80 px-4 backdrop-blur sm:px-6">
+          <div className="flex items-center gap-2">
             <span className="md:hidden">
               <Logo />
             </span>
@@ -78,10 +77,13 @@ export function AppShell({
             </form>
           </div>
         </header>
-        <main className="mx-auto max-w-6xl animate-fade-in px-4 py-8 sm:px-6 lg:px-8">
+        <main className="mx-auto max-w-6xl animate-fade-in px-4 pb-24 pt-8 sm:px-6 md:pb-10 lg:px-8">
           {children}
         </main>
       </div>
+
+      {/* Mobile bottom tab bar + full-menu drawer */}
+      <MobileNav nav={nav} user={user} roleLabel={roleLabel[user.role]} />
     </div>
   );
 }
