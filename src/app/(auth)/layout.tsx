@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { Wallet, ShieldCheck, BadgeCheck, Banknote } from "lucide-react";
+import { ShieldCheck, BadgeCheck, Banknote } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export default function AuthLayout({
   children,
@@ -18,12 +18,9 @@ export default function AuthLayout({
             backgroundSize: "28px 28px",
           }}
         />
-        <Link href="/" className="relative flex items-center gap-2">
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-white/15 backdrop-blur">
-            <Wallet className="h-5 w-5" />
-          </span>
-          <span className="text-xl font-bold tracking-tight">GTMS</span>
-        </Link>
+        <div className="relative">
+          <BrandLogo light />
+        </div>
 
         <div className="relative">
           <h2 className="max-w-md text-3xl font-semibold leading-tight">
@@ -56,15 +53,9 @@ export default function AuthLayout({
 
       {/* Form panel */}
       <div className="flex w-full flex-col items-center justify-center bg-[var(--background)] px-4 py-12 lg:w-1/2">
-        <Link
-          href="/"
-          className="mb-8 flex items-center gap-2 text-xl font-bold text-slate-900 lg:hidden"
-        >
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-brand-600 to-emerald-500 text-white">
-            <Wallet className="h-[18px] w-[18px]" />
-          </span>
-          GTMS
-        </Link>
+        <div className="mb-8 lg:hidden">
+          <BrandLogo />
+        </div>
         <div className="w-full max-w-sm rounded-2xl border border-slate-200/80 bg-white p-7 shadow-soft">
           {children}
         </div>

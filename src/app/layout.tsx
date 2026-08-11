@@ -9,9 +9,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "GTMS — Recruiting & Payroll Platform",
+  title: "GTMS — Workforce & Payroll Platform",
   description:
-    "GTMS recruits people to work and pays them a salary. Onboard your team, run payroll, and let employees withdraw — all in one place.",
+    "GTMS unifies recruiting, onboarding, training, and payroll — hire, onboard, and pay your team in one elegant workspace.",
+  icons: { icon: "/gtms-logo.png" },
 };
 
 export default function RootLayout({

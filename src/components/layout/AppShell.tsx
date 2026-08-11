@@ -1,12 +1,12 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Role } from "@prisma/client";
-import { Wallet, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { logoutAction } from "@/server/actions/logout.action";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { SidebarNav, type NavItem } from "@/components/layout/SidebarNav";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { DemoBadge } from "@/components/layout/DemoBadge";
+import { BrandLogo } from "@/components/BrandLogo";
 import { Avatar } from "@/components/ui";
 
 export type { NavItem };
@@ -16,17 +16,6 @@ const roleLabel: Record<Role, string> = {
   REQUESTER: "Recruiter",
   ADMIN: "Admin · HR",
 };
-
-function Logo() {
-  return (
-    <Link href="/" className="flex items-center gap-2">
-      <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-brand-600 to-emerald-500 text-white shadow-sm">
-        <Wallet className="h-[18px] w-[18px]" />
-      </span>
-      <span className="text-lg font-bold tracking-tight text-slate-900">GTMS</span>
-    </Link>
-  );
-}
 
 export function AppShell({
   user,
@@ -41,7 +30,7 @@ export function AppShell({
     <div className="min-h-screen bg-[var(--background)]">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-slate-200 bg-white md:flex">
         <div className="flex h-16 items-center justify-between border-b border-slate-100 px-5">
-          <Logo />
+          <BrandLogo />
           <DemoBadge />
         </div>
         <SidebarNav items={nav} />
@@ -62,7 +51,7 @@ export function AppShell({
         <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white/80 px-4 backdrop-blur sm:px-6">
           <div className="flex items-center gap-2">
             <span className="md:hidden">
-              <Logo />
+              <BrandLogo />
             </span>
             <span className="hidden rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700 md:inline-flex">
               {roleLabel[user.role]}

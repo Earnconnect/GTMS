@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Wallet,
   ShieldCheck,
   BadgeCheck,
   Banknote,
@@ -16,19 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { ButtonLink } from "@/components/ui";
-
-function Logo({ light = false }: { light?: boolean }) {
-  return (
-    <Link href="/" className="flex items-center gap-2">
-      <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-gradient text-white shadow-glow">
-        <Wallet className="h-[18px] w-[18px]" />
-      </span>
-      <span className={`text-lg font-bold tracking-tight ${light ? "text-white" : "text-slate-900"}`}>
-        GTMS
-      </span>
-    </Link>
-  );
-}
+import { BrandLogo } from "@/components/BrandLogo";
 
 /* A polished product-preview mockup for the hero (self-contained). */
 function DashboardPreview() {
@@ -92,7 +79,7 @@ export default function LandingPage() {
     <main className="min-h-screen">
       <header className="sticky top-0 z-20 border-b border-slate-200/60 glass">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
-          <Logo />
+          <BrandLogo />
           <nav className="flex items-center gap-1 sm:gap-2">
             <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900">
               Sign in
@@ -249,7 +236,7 @@ export default function LandingPage() {
 
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 sm:flex-row">
-          <Logo />
+          <BrandLogo />
           <p className="text-sm text-slate-500">© GTMS — recruiting, employment &amp; payroll.</p>
         </div>
       </footer>

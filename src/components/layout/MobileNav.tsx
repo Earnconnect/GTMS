@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { X, Wallet, LogOut, MoreHorizontal, Circle } from "lucide-react";
+import { X, LogOut, MoreHorizontal, Circle } from "lucide-react";
 import { clsx } from "@/lib/cn";
 import { logoutAction } from "@/server/actions/logout.action";
 import { NAV_ICONS, type NavItem } from "./navShared";
+import { BrandLogo } from "@/components/BrandLogo";
 import { Avatar } from "@/components/ui";
 
 export function MobileNav({
@@ -97,12 +98,9 @@ export function MobileNav({
           )}
         >
           <div className="flex h-16 items-center justify-between border-b border-slate-100 px-5">
-            <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-              <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-brand-600 to-emerald-500 text-white shadow-sm">
-                <Wallet className="h-[18px] w-[18px]" />
-              </span>
-              <span className="text-lg font-bold tracking-tight text-slate-900">GTMS</span>
-            </Link>
+            <span onClick={() => setOpen(false)}>
+              <BrandLogo />
+            </span>
             <button
               type="button"
               onClick={() => setOpen(false)}
