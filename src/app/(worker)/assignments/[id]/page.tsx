@@ -5,6 +5,8 @@ import { requireRole } from "@/server/rbac";
 import { db } from "@/server/db";
 import { Badge, SectionCard } from "@/components/ui";
 import { StartButton, SubmitWork } from "@/components/work/AssignmentActions";
+import { AssignmentThread } from "@/components/work/AssignmentThread";
+import { MessagesSquare } from "lucide-react";
 
 const STATUS_TONE: Record<string, "gray" | "yellow" | "blue" | "green" | "red"> = {
   ASSIGNED: "blue",
@@ -20,9 +22,25 @@ export default async function AssignmentDetailPage({ params }: { params: Promise
 
   const a = await db.jobAssignment.findUnique({
     where: { id },
-    include: { job: { select: { department: true, location: true } } },
+    include: {
+      job: { select: { department: true, location: true } },
+      messages: {
+        orderBy: { createdAt: "asc" },
+        include: { author: { select: { id: true, name: true, email: true } } },
+      },
+    },
   });
   if (!a || a.employeeId !== user.id) notFound();
+
+  const thread = a.messages.map((m) => ({
+    id: m.id,
+    body: m.body,
+    isStaff: m.isStaff,
+    authorId: m.authorId,
+    authorName: m.author.name,
+    authorEmail: m.author.email,
+    createdAt: m.createdAt,
+  }));
 
   return (
     <div className="space-y-6">
@@ -91,6 +109,14 @@ export default async function AssignmentDetailPage({ params }: { params: Promise
           <p className="text-sm text-slate-600">{a.reviewNote}</p>
         </SectionCard>
       )}
+
+      <SectionCard
+        title="Discussion"
+        description="Message your manager about this assignment."
+        action={<MessagesSquare className="h-4 w-4 text-slate-400" />}
+      >
+        <AssignmentThread assignmentId={a.id} messages={thread} meId={user.id} />
+      </SectionCard>
     </div>
   );
 }

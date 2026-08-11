@@ -195,11 +195,12 @@ model User {
   jobPostings     JobPosting[]        @relation("JobPoster")
   applications    JobApplication[]    @relation("Applicant")
   enrollments     TrainingEnrollment[]
-  jobReports       JobReport[]
-  documents        OnboardingDocument[]
-  retirementPlan   RetirementPlan?
-  withdrawalMethod WithdrawalMethod?
-  workAssignments  JobAssignment[]      @relation("EmployeeWork")
+  jobReports         JobReport[]
+  documents          OnboardingDocument[]
+  retirementPlan     RetirementPlan?
+  withdrawalMethod   WithdrawalMethod?
+  workAssignments    JobAssignment[]      @relation("EmployeeWork")
+  assignmentMessages AssignmentMessage[]
 
   // Stripe Connect account ID (workers only — used as payout destination)
   stripeConnectId String?
@@ -643,11 +644,26 @@ model JobAssignment {
   completedAt    DateTime?
   submissionNote String?
   reviewNote     String?
+  messages       AssignmentMessage[]
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
 
   @@index([employeeId, status])
   @@index([status])
+}
+
+// Back-and-forth discussion between the assigned employee and admins.
+model AssignmentMessage {
+  id           String        @id @default(cuid())
+  assignmentId String
+  assignment   JobAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  authorId     String
+  author       User          @relation(fields: [authorId], references: [id])
+  body         String
+  isStaff      Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+
+  @@index([assignmentId, createdAt])
 }
 
 model JobApplication {

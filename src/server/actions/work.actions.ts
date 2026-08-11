@@ -91,6 +91,46 @@ export async function submitAssignmentAction(input: {
   return { ok: true };
 }
 
+/** Post a message in an assignment's discussion (employee or an admin). */
+export async function postAssignmentMessageAction(input: {
+  assignmentId: string;
+  body: string;
+}): Promise<ActionResult> {
+  const user = await requireActiveUser();
+  const body = input.body.trim();
+  if (!body) return { error: "Write a message first." };
+  if (body.length > 4000) return { error: "Message is too long." };
+
+  try {
+    const a = await db.jobAssignment.findUnique({ where: { id: input.assignmentId } });
+    if (!a) return { error: "Assignment not found." };
+    const isAdmin = user.role === "ADMIN";
+    if (!isAdmin && a.employeeId !== user.id) return { error: "You don't have access to this assignment." };
+
+    await db.assignmentMessage.create({
+      data: { assignmentId: a.id, authorId: user.id, body, isStaff: isAdmin },
+    });
+
+    // Notify the other side.
+    if (isAdmin) {
+      await notify(a.employeeId, "SYSTEM", "New message on your assignment", {
+        body: `Re: ${a.title}`,
+        link: `/assignments/${a.id}`,
+      });
+    } else if (a.assignedById) {
+      await notify(a.assignedById, "SYSTEM", "New message from employee", {
+        body: `Re: ${a.title}`,
+        link: `/admin/assignments/${a.id}`,
+      });
+    }
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Could not send message" };
+  }
+  revalidatePath(`/assignments/${input.assignmentId}`);
+  revalidatePath(`/admin/assignments/${input.assignmentId}`);
+  return { ok: true };
+}
+
 /** Admin reviews a submitted assignment: approve (complete) or send back. */
 export async function reviewAssignmentAction(input: {
   assignmentId: string;

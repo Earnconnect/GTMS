@@ -1,4 +1,5 @@
-import { Briefcase, ClipboardList } from "lucide-react";
+import Link from "next/link";
+import { Briefcase, ClipboardList, MessagesSquare, ArrowRight } from "lucide-react";
 import { requireRole } from "@/server/rbac";
 import { db } from "@/server/db";
 import { PageHeader, Badge, StatCard, SectionCard, Avatar, EmptyState } from "@/components/ui";
@@ -20,7 +21,7 @@ export default async function AdminAssignmentsPage() {
     db.jobAssignment.findMany({
       orderBy: [{ status: "asc" }, { createdAt: "desc" }],
       take: 200,
-      include: { employee: { select: { name: true, email: true } } },
+      include: { employee: { select: { name: true, email: true } }, _count: { select: { messages: true } } },
     }),
     db.user.findMany({
       where: { employmentStatus: { not: null }, email: { not: SYSTEM_USER_EMAIL } },
@@ -85,6 +86,14 @@ export default async function AdminAssignmentsPage() {
                   </p>
                 )}
                 {a.status === "SUBMITTED" && <AssignmentReview assignmentId={a.id} />}
+                <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
+                  <Link href={`/admin/assignments/${a.id}`} className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-600 hover:underline">
+                    <MessagesSquare className="h-3.5 w-3.5" /> Discussion{a._count.messages ? ` (${a._count.messages})` : ""}
+                  </Link>
+                  <Link href={`/admin/assignments/${a.id}`} className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900">
+                    Open <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
               </li>
             ))}
           </ul>
