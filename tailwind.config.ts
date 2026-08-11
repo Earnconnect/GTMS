@@ -32,21 +32,26 @@ export default {
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "var(--font-sans)", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        card: "0 1px 2px 0 rgb(16 24 40 / 0.04), 0 1px 3px 0 rgb(16 24 40 / 0.06)",
+        // Layered, low-contrast shadows read as expensive; harsh single drops read cheap.
+        card: "0 1px 2px 0 rgb(16 24 40 / 0.04), 0 1px 3px 0 rgb(16 24 40 / 0.05)",
         "card-hover":
-          "0 10px 30px -6px rgb(16 24 40 / 0.12), 0 4px 10px -4px rgb(16 24 40 / 0.08)",
-        soft: "0 8px 30px -8px rgb(16 24 40 / 0.12)",
+          "0 12px 32px -8px rgb(16 24 40 / 0.13), 0 4px 12px -4px rgb(16 24 40 / 0.08)",
+        soft: "0 10px 34px -10px rgb(16 24 40 / 0.14)",
         elevated:
-          "0 24px 60px -18px rgb(16 24 40 / 0.28), 0 8px 24px -12px rgb(16 24 40 / 0.16)",
-        glow: "0 8px 30px -6px rgb(13 148 136 / 0.45)",
+          "0 28px 64px -20px rgb(16 24 40 / 0.32), 0 10px 26px -14px rgb(16 24 40 / 0.18)",
+        glow: "0 10px 30px -8px rgb(13 148 136 / 0.42)",
         "inner-top": "inset 0 1px 0 0 rgb(255 255 255 / 0.6)",
+        ring: "inset 0 0 0 1px rgb(15 23 42 / 0.06)",
       },
       backgroundImage: {
-        "brand-gradient": "linear-gradient(135deg, #0d9488 0%, #10b981 100%)",
+        "brand-gradient": "linear-gradient(135deg, #0f766e 0%, #0d9488 42%, #10b981 100%)",
         "brand-radial":
           "radial-gradient(60% 60% at 50% 0%, rgba(13,148,136,0.10) 0%, transparent 70%)",
+        "hero-mesh":
+          "radial-gradient(38rem 26rem at 12% 0%, rgba(45,212,191,0.16), transparent 60%), radial-gradient(34rem 24rem at 100% 20%, rgba(16,185,129,0.14), transparent 58%), linear-gradient(135deg, #0b3f3a 0%, #0f766e 55%, #059669 100%)",
       },
       borderRadius: {
         xl: "0.875rem",

@@ -209,7 +209,7 @@ export default function LandingPage() {
                 <span className="grid h-11 w-11 place-items-center rounded-xl bg-brand-50 text-brand-700">
                   <f.icon className="h-5 w-5" />
                 </span>
-                <span className="text-2xl font-bold text-slate-100">{f.step}</span>
+                <span className="font-display text-3xl font-bold text-slate-200/80">{f.step}</span>
               </div>
               <h3 className="mt-4 text-base font-semibold text-slate-900">{f.title}</h3>
               <p className="mt-2 text-sm text-slate-600">{f.body}</p>
@@ -220,7 +220,7 @@ export default function LandingPage() {
 
       {/* CTA */}
       <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-        <div className="relative overflow-hidden rounded-3xl bg-brand-gradient px-8 py-14 text-center shadow-elevated sm:px-12">
+        <div className="relative overflow-hidden rounded-3xl bg-hero-mesh px-8 py-14 text-center shadow-elevated sm:px-12">
           <div className="pointer-events-none absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, white 1px, transparent 1px)", backgroundSize: "26px 26px" }} />
           <h2 className="relative text-3xl font-bold tracking-tight text-white sm:text-4xl">Ready to build your team?</h2>
           <p className="relative mx-auto mt-3 max-w-xl text-white/85">

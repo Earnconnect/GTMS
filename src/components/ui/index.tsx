@@ -7,23 +7,23 @@ type Size = "sm" | "md" | "lg";
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    "bg-brand-gradient text-white shadow-glow hover:brightness-110 focus-visible:outline-brand-600 disabled:opacity-60 disabled:shadow-none",
+    "bg-brand-gradient text-white shadow-glow hover:shadow-[0_12px_34px_-8px_rgb(13_148_136_/_0.55)] hover:brightness-[1.06] active:brightness-95 disabled:opacity-60 disabled:shadow-none",
   success:
-    "bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 disabled:bg-emerald-300",
+    "bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 active:bg-emerald-800 disabled:bg-emerald-300",
   secondary:
-    "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 hover:border-slate-400 disabled:opacity-60",
-  danger: "bg-red-600 text-white shadow-sm hover:bg-red-700 disabled:bg-red-300",
-  ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+    "bg-white text-slate-700 ring-1 ring-inset ring-slate-200 shadow-sm hover:bg-slate-50 hover:ring-slate-300 active:bg-slate-100 disabled:opacity-60",
+  danger: "bg-red-600 text-white shadow-sm hover:bg-red-700 active:bg-red-800 disabled:bg-red-300",
+  ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900 active:bg-slate-200",
 };
 
 const sizeClasses: Record<Size, string> = {
   sm: "px-3 py-1.5 text-xs",
-  md: "px-4 py-2 text-sm",
-  lg: "px-5 py-2.5 text-base",
+  md: "px-4 py-2.5 text-sm",
+  lg: "px-5 py-3 text-base",
 };
 
 const baseBtn =
-  "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors duration-150 disabled:cursor-not-allowed";
+  "inline-flex items-center justify-center gap-2 rounded-lg font-semibold tracking-[-0.01em] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed";
 
 export function Button({
   variant = "primary",
@@ -63,7 +63,7 @@ export function Card({
   return (
     <div
       className={clsx(
-        "rounded-2xl border border-slate-200/80 bg-white p-5 shadow-card",
+        "rounded-2xl border border-slate-200/70 bg-white p-5 shadow-card ring-1 ring-inset ring-slate-900/[0.02]",
         className,
       )}
     >
@@ -89,16 +89,16 @@ export function SectionCard({
   return (
     <div
       className={clsx(
-        "rounded-2xl border border-slate-200/80 bg-white shadow-card",
+        "overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-card ring-1 ring-inset ring-slate-900/[0.02]",
         className,
       )}
     >
-      <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-4">
+      <div className="flex items-start justify-between gap-4 border-b border-slate-100 bg-slate-50/40 px-5 py-4">
         <div>
-          <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
+          <h2 className="text-[0.9rem] font-semibold tracking-[-0.01em] text-slate-900">{title}</h2>
           {description && <p className="mt-0.5 text-xs text-slate-500">{description}</p>}
         </div>
-        {action}
+        {action && <div className="shrink-0">{action}</div>}
       </div>
       <div className="p-5">{children}</div>
     </div>
@@ -137,7 +137,7 @@ export function StatCard({
           </span>
         )}
       </div>
-      <p className="relative mt-3 text-[1.7rem] font-semibold leading-none tracking-tight text-slate-900 tabular-nums">
+      <p className="font-display relative mt-3 text-[1.7rem] font-semibold leading-none tracking-tight text-slate-900 tabular-nums">
         {value}
       </p>
       {hint && <p className="relative mt-1.5 text-xs text-slate-400">{hint}</p>}
@@ -149,7 +149,7 @@ export function Input({ className, ...props }: ComponentProps<"input">) {
   return (
     <input
       className={clsx(
-        "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30",
+        "w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25",
         className,
       )}
       {...props}
@@ -161,7 +161,7 @@ export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
   return (
     <textarea
       className={clsx(
-        "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30",
+        "w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25",
         className,
       )}
       {...props}
@@ -209,7 +209,7 @@ export function Badge({
   return (
     <span
       className={clsx(
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset",
+        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[0.7rem] font-semibold uppercase tracking-wide ring-1 ring-inset",
         badgeTones[tone],
       )}
     >
@@ -240,17 +240,26 @@ export function Avatar({ name, email, size = 36 }: { name?: string | null; email
 export function PageHeader({
   title,
   subtitle,
+  eyebrow,
   action,
 }: {
   title: string;
   subtitle?: string;
+  eyebrow?: string;
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
+    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="min-w-0">
+        {eyebrow && (
+          <p className="mb-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-brand-600">
+            {eyebrow}
+          </p>
+        )}
+        <h1 className="text-[1.7rem] font-semibold leading-tight tracking-[-0.02em] text-slate-900">
+          {title}
+        </h1>
+        {subtitle && <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-slate-500">{subtitle}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </div>

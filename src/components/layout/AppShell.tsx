@@ -28,17 +28,17 @@ export function AppShell({
 }) {
   return (
     <div className="min-h-screen bg-[var(--background)]">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-slate-200 bg-white md:flex">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-slate-200/80 bg-white/95 backdrop-blur md:flex">
         <div className="flex h-16 items-center justify-between border-b border-slate-100 px-5">
           <BrandLogo />
           <DemoBadge />
         </div>
         <SidebarNav items={nav} />
         <div className="border-t border-slate-100 p-3">
-          <div className="flex items-center gap-3 rounded-lg px-2 py-2">
+          <div className="flex items-center gap-3 rounded-xl bg-slate-50/70 px-2.5 py-2.5 ring-1 ring-inset ring-slate-200/60">
             <Avatar name={user.name} email={user.email} size={36} />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-slate-800">
+              <p className="truncate text-sm font-semibold text-slate-800">
                 {user.name ?? user.email}
               </p>
               <p className="truncate text-xs text-slate-400">{roleLabel[user.role]}</p>

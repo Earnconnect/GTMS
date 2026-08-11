@@ -34,7 +34,7 @@ export function BrandLogo({
         className="block h-10 w-10 shrink-0 rounded-lg shadow-sm ring-1 ring-white/10"
       />
       {showText && (
-        <span className={`text-lg font-bold tracking-tight ${light ? "text-white" : "text-slate-900"}`}>
+        <span className={`font-display text-lg font-bold tracking-[0.02em] ${light ? "text-white" : "text-slate-900"}`}>
           GTMS
         </span>
       )}
