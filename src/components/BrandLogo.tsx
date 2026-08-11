@@ -7,12 +7,14 @@ import Link from "next/link";
  * The background-size / position values crop the wide source image down to just
  * the emblem on the left. If the emblem looks off-centre, tweak `EMBLEM` below.
  */
+// Crop the 1536x1024 source down to the emblem (core+glow center ≈ 370,488)
+// into a 40px tile. Emblem framed on a dark ground so the blue glow reads.
 const EMBLEM: React.CSSProperties = {
   backgroundImage: "url('/gtms-logo.png')",
-  backgroundColor: "#0d9488", // graceful fallback (teal) until the file is added
+  backgroundColor: "#050b16",
   backgroundRepeat: "no-repeat",
-  backgroundSize: "154px 102px", // source (1536x1024) scaled to ~0.1
-  backgroundPosition: "-13px -30px", // shift to the emblem on the left
+  backgroundSize: "134px 89px",
+  backgroundPosition: "-6px -22px",
 };
 
 export function BrandLogo({
@@ -29,7 +31,7 @@ export function BrandLogo({
       <span
         style={EMBLEM}
         aria-label="GTMS"
-        className="block h-9 w-9 shrink-0 rounded-lg shadow-sm ring-1 ring-white/10"
+        className="block h-10 w-10 shrink-0 rounded-lg shadow-sm ring-1 ring-white/10"
       />
       {showText && (
         <span className={`text-lg font-bold tracking-tight ${light ? "text-white" : "text-slate-900"}`}>
