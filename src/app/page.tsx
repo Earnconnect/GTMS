@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Image from "next/image";
 import {
   ShieldCheck,
@@ -20,13 +19,11 @@ import {
   FileCheck2,
   ScrollText,
   Users,
-  Clock,
-  Globe,
-  Mail,
   CheckCircle2,
 } from "lucide-react";
 import { ButtonLink } from "@/components/ui";
-import { BrandLogo } from "@/components/BrandLogo";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SiteFooter } from "@/components/layout/SiteFooter";
 
 export const metadata: Metadata = {
   title: "GTMS — Recruiting, Onboarding & Payroll in one platform",
@@ -189,26 +186,7 @@ const FAQ = [
 export default function LandingPage() {
   return (
     <main className="min-h-screen">
-      <header className="sticky top-0 z-20 border-b border-slate-200/60 glass">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
-          <BrandLogo />
-          <nav className="flex items-center gap-1 sm:gap-2">
-            <Link href="#modules" className="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 md:inline-flex">
-              Platform
-            </Link>
-            <Link href="#security" className="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 md:inline-flex">
-              Security
-            </Link>
-            <Link href="#faq" className="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 md:inline-flex">
-              FAQ
-            </Link>
-            <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900">
-              Sign in
-            </Link>
-            <ButtonLink href="/register">Apply now</ButtonLink>
-          </nav>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Hero */}
       <section className="relative overflow-hidden">
@@ -465,49 +443,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto max-w-6xl px-6 py-12">
-          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
-            <div className="lg:col-span-2">
-              <BrandLogo />
-              <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-500">
-                The workforce &amp; payroll platform that carries every employee securely from
-                application to paycheck — recruiting, onboarding, training, and payroll in one place.
-              </p>
-              <div className="mt-4 flex flex-col gap-1.5 text-sm text-slate-500">
-                <span className="inline-flex items-center gap-2"><Mail className="h-4 w-4 text-slate-400" /> support@gtms.app</span>
-                <span className="inline-flex items-center gap-2"><Globe className="h-4 w-4 text-slate-400" /> Available worldwide</span>
-                <span className="inline-flex items-center gap-2"><Clock className="h-4 w-4 text-slate-400" /> Support Mon–Fri, 9–6</span>
-              </div>
-            </div>
-            {[
-              { h: "Platform", links: [["Modules", "#modules"], ["How it works", "#how"], ["Security", "#security"], ["FAQ", "#faq"]] },
-              { h: "Company", links: [["About", "#about"], ["Careers", "/register"], ["Contact", "mailto:support@gtms.app"]] },
-              { h: "Get started", links: [["Apply now", "/register"], ["Sign in", "/login"]] },
-            ].map((col) => (
-              <div key={col.h}>
-                <p className="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-slate-400">{col.h}</p>
-                <ul className="mt-3 space-y-2 text-sm">
-                  {col.links.map(([label, href]) => (
-                    <li key={label}>
-                      <Link href={href} className="text-slate-600 transition-colors hover:text-brand-700">
-                        {label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-          <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-slate-100 pt-6 text-xs text-slate-400 sm:flex-row">
-            <p>© GTMS — recruiting, employment &amp; payroll platform. All rights reserved.</p>
-            <p className="inline-flex items-center gap-4">
-              <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5" /> Enterprise-grade security</span>
-            </p>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
