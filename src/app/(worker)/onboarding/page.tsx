@@ -35,8 +35,9 @@ export default async function OnboardingPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow="Getting started"
         title="Onboarding"
-        subtitle="Complete these steps to finish setting up your employment."
+        subtitle="Welcome aboard. Work through these guided steps — your profile, documents, verification, benefits, and training — to finish setting up your employment and unlock everything the platform offers."
       />
 
       {/* Progress overview */}

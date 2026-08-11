@@ -20,7 +20,11 @@ export default async function AdminCatalogPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Assignment catalog" subtitle="Manage the ready-made assignments admins can assign to employees." />
+      <PageHeader
+        eyebrow="Work management"
+        title="Assignment catalog"
+        subtitle="Curate a library of ready-made, role-matched assignments your team can draw from — so assigning meaningful work to any employee takes seconds, not drafting."
+      />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard label="Templates" value={templates.length} icon={<Library className="h-5 w-5" />} tone="brand" />

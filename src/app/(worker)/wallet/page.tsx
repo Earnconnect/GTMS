@@ -49,8 +49,9 @@ export default async function WorkerWalletPage({
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow="Payroll"
         title="Pay & wallet"
-        subtitle="Track your earnings and withdraw to your preferred method."
+        subtitle="Your earnings, in one clear view. Follow every salary payment as it lands, review your full pay history, and withdraw your available balance to the method that suits you."
       />
 
       {sp.stripe_connected === "1" && (

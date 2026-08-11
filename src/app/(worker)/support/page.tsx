@@ -8,7 +8,11 @@ export default async function WorkerSupportPage() {
   const tickets = await loadTicketViews({ userId: user.id });
   return (
     <div>
-      <PageHeader title="Support" subtitle="Get help from our team." />
+      <PageHeader
+        eyebrow="Help center"
+        title="Support"
+        subtitle="Have a question about your role, onboarding, or pay? Reach our team here and we'll get back to you — we're glad to help."
+      />
       <SupportCenter tickets={tickets} isAdmin={false} allowCreate />
     </div>
   );

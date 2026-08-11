@@ -19,7 +19,11 @@ export default async function AdminPayoutsPage() {
 
   return (
     <div>
-      <PageHeader title="Payouts" subtitle="Process worker withdrawal requests." />
+      <PageHeader
+        eyebrow="Payroll"
+        title="Withdrawals"
+        subtitle="Review and process the withdrawal requests your team submits, releasing verified balances to their chosen payout method."
+      />
       {payouts.length === 0 ? (
         <EmptyState>No payouts yet.</EmptyState>
       ) : (

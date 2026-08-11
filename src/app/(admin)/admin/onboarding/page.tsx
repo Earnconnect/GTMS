@@ -34,7 +34,11 @@ export default async function AdminOnboardingPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Document verification" subtitle="Review onboarding documents submitted by employees." />
+      <PageHeader
+        eyebrow="Compliance"
+        title="Document verification"
+        subtitle="Review the identity, tax, and employment documents your new hires submit, approve or return them with a note, and keep every record securely on file."
+      />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard label="Awaiting review" value={pending.length} icon={<FileText className="h-5 w-5" />} tone="amber" />

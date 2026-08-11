@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -13,9 +14,25 @@ import {
   TrendingUp,
   Building2,
   Sparkles,
+  ClipboardList,
+  Wallet,
+  Lock,
+  FileCheck2,
+  ScrollText,
+  Users,
+  Clock,
+  Globe,
+  Mail,
+  CheckCircle2,
 } from "lucide-react";
 import { ButtonLink } from "@/components/ui";
 import { BrandLogo } from "@/components/BrandLogo";
+
+export const metadata: Metadata = {
+  title: "GTMS — Recruiting, Onboarding & Payroll in one platform",
+  description:
+    "GTMS is an enterprise workforce platform that unifies recruiting, onboarding, training, assignments, and payroll — carrying every employee securely from application to paycheck.",
+};
 
 /* A polished product-preview mockup for the hero (self-contained). */
 function DashboardPreview() {
@@ -40,7 +57,7 @@ function DashboardPreview() {
                 <span className={`grid h-8 w-8 place-items-center rounded-lg ${s.t}`}>
                   <s.i className="h-4 w-4" />
                 </span>
-                <p className="mt-2 text-lg font-semibold text-slate-900">{s.v}</p>
+                <p className="font-display mt-2 text-lg font-semibold text-slate-900">{s.v}</p>
                 <p className="text-[11px] text-slate-400">{s.l}</p>
               </div>
             ))}
@@ -74,6 +91,101 @@ function DashboardPreview() {
   );
 }
 
+const MODULES = [
+  {
+    icon: Briefcase,
+    title: "Recruiting & placement",
+    body:
+      "Publish open roles, receive applications with attached CVs, run structured virtual interviews, and place candidates into positions — a single pipeline from applicant to hire.",
+    points: ["Job postings & applications", "CV submission & review", "Candidate placement"],
+  },
+  {
+    icon: FileCheck2,
+    title: "Onboarding & verification",
+    body:
+      "Give every new hire a guided checklist. Collect and verify identity and employment documents, capture benefit elections, and track each step through to completion.",
+    points: ["Document upload & review", "Identity verification", "Admin-configurable requirements"],
+  },
+  {
+    icon: GraduationCap,
+    title: "Training & bootcamp",
+    body:
+      "Assign structured courses and modules, monitor progress in real time, and issue completion certificates that get new hires productive from day one.",
+    points: ["Courses & modules", "Progress tracking", "Completion certificates"],
+  },
+  {
+    icon: ClipboardList,
+    title: "Assignments & work",
+    body:
+      "Assign real work matched to each role, let employees start and submit deliverables, review the results, and collaborate in a discussion thread on every assignment.",
+    points: ["Role-based assignment catalog", "Submit & review workflow", "Per-assignment messaging"],
+  },
+  {
+    icon: Wallet,
+    title: "Payroll & wallet",
+    body:
+      "Pay salaries directly to each employee's in-platform wallet, keep a complete ledger of every transaction, and let people set withdrawal methods and cash out on their terms.",
+    points: ["Direct salary payments", "Full transaction ledger", "Employee-managed payouts"],
+  },
+  {
+    icon: Video,
+    title: "Virtual interviews",
+    body:
+      "Schedule and run interviews inside the platform with secure video rooms — no external meeting tools, links, or downloads required for either side.",
+    points: ["In-platform video", "Scheduling & reminders", "No external tools"],
+  },
+];
+
+const SECURITY = [
+  {
+    icon: Lock,
+    title: "Encrypted document storage",
+    body:
+      "Sensitive documents are stored in private, access-controlled storage and served only to their owner or an authorized administrator.",
+  },
+  {
+    icon: Users,
+    title: "Role-based access control",
+    body:
+      "Every action is gated by role — employee, recruiter, or administrator — so people see exactly what they need and nothing more.",
+  },
+  {
+    icon: ScrollText,
+    title: "Complete audit trail",
+    body:
+      "Every payment and balance change is written to an immutable ledger, giving you an accurate, audit-ready record of all financial activity.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "One-way payroll security",
+    body:
+      "Money moves in one direction only — from the company to your team. Employees never deposit funds or expose banking credentials to earn.",
+  },
+];
+
+const FAQ = [
+  {
+    q: "How does payroll work?",
+    a: "Administrators run salary payments that are credited directly to each employee's in-platform wallet. Every payment is recorded in a full ledger, and employees can review their complete pay history at any time.",
+  },
+  {
+    q: "Is my personal information secure?",
+    a: "Yes. Identity and onboarding documents are held in private, access-controlled storage and are only ever visible to you and authorized administrators. Access across the platform is governed by strict role-based permissions.",
+  },
+  {
+    q: "What do I need to get onboarded?",
+    a: "After you're placed in a role, your onboarding checklist guides you through profile details, document verification, benefit elections, and a short training bootcamp. Your administrator can tailor the exact documents required.",
+  },
+  {
+    q: "Do I need any external tools for interviews or training?",
+    a: "No. Interviews run in secure video rooms inside the platform, and all training courses and modules are delivered natively — there's nothing extra to install for you or your interviewer.",
+  },
+  {
+    q: "How do withdrawals work?",
+    a: "Once you've verified your identity, you can add a withdrawal method and cash out your available balance. Funds only ever flow from the company to you — you'll never be asked to deposit money to get paid.",
+  },
+];
+
 export default function LandingPage() {
   return (
     <main className="min-h-screen">
@@ -81,6 +193,15 @@ export default function LandingPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
           <BrandLogo />
           <nav className="flex items-center gap-1 sm:gap-2">
+            <Link href="#modules" className="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 md:inline-flex">
+              Platform
+            </Link>
+            <Link href="#security" className="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 md:inline-flex">
+              Security
+            </Link>
+            <Link href="#faq" className="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 md:inline-flex">
+              FAQ
+            </Link>
             <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900">
               Sign in
             </Link>
@@ -102,9 +223,9 @@ export default function LandingPage() {
               Hire, onboard, and <span className="text-gradient">pay your team</span> with confidence
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-slate-600">
-              GTMS brings recruiting, onboarding, training, and payroll into one elegant
-              workspace. Place talent into roles, run payroll in a click, and give every
-              employee a seamless experience from application to paycheck.
+              GTMS unifies recruiting, onboarding, training, assignments, and payroll in one
+              secure workspace. Place talent into roles, get new hires productive fast, and run
+              payroll with complete visibility — from the first application to every paycheck.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <ButtonLink href="/register" size="lg" className="gap-2">
@@ -128,8 +249,29 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Credibility strip */}
+      <section className="border-y border-slate-200/60 bg-white/60">
+        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
+          <p className="text-center text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-slate-400">
+            One platform for the entire employee lifecycle
+          </p>
+          <div className="mt-4 grid grid-cols-2 gap-4 text-center sm:grid-cols-4">
+            {[
+              [Lock, "Encrypted storage"],
+              [Users, "Role-based access"],
+              [ScrollText, "Audit-ready ledger"],
+              [ShieldCheck, "One-way payroll"],
+            ].map(([Icon, label]) => (
+              <div key={label as string} className="flex items-center justify-center gap-2 text-sm font-medium text-slate-600">
+                <Icon className="h-4 w-4 text-brand-600" /> {label as string}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Value props */}
-      <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <div className="grid gap-5 sm:grid-cols-3">
           {[
             { icon: UserPlus, title: "Effortless hiring", body: "Post roles, review applicants, run virtual interviews, and place talent — all in one pipeline." },
@@ -147,8 +289,42 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Platform modules — detailed */}
+      <section id="modules" className="scroll-mt-20 border-y border-slate-200/60 bg-white/50">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-brand-600">The platform</span>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+              Every stage of employment, connected
+            </h2>
+            <p className="mt-3 text-slate-600">
+              Six integrated modules replace the patchwork of spreadsheets and disconnected tools —
+              so your people, documents, and payments all live in one secure system of record.
+            </p>
+          </div>
+          <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {MODULES.map((m) => (
+              <div key={m.title} className="flex flex-col rounded-2xl border border-slate-200/70 bg-white p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover">
+                <span className="grid h-11 w-11 place-items-center rounded-xl bg-brand-50 text-brand-700 ring-1 ring-inset ring-brand-100">
+                  <m.icon className="h-5 w-5" />
+                </span>
+                <h3 className="mt-4 text-base font-semibold text-slate-900">{m.title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{m.body}</p>
+                <ul className="mt-4 space-y-1.5 border-t border-slate-100 pt-4">
+                  {m.points.map((p) => (
+                    <li key={p} className="flex items-center gap-2 text-xs text-slate-500">
+                      <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" /> {p}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* For teams — with imagery */}
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <section id="about" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-16 sm:px-6">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div className="relative">
             <div className="absolute -inset-4 rounded-[2rem] bg-brand-gradient opacity-10 blur-2xl" />
@@ -165,17 +341,19 @@ export default function LandingPage() {
           <div>
             <span className="text-sm font-semibold uppercase tracking-wide text-brand-600">For growing teams</span>
             <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
-              Everything your workforce needs, in one place
+              Built to run a workforce, end to end
             </h2>
             <p className="mt-4 text-slate-600">
-              Replace the patchwork of spreadsheets and disconnected tools. GTMS unifies the
-              full employee journey so your people can focus on the work that matters.
+              GTMS is designed for organizations that want to hire, develop, and pay their people
+              without stitching together half a dozen systems. From the day a candidate applies to
+              the day their salary lands, every record lives in one connected platform — accurate,
+              searchable, and secure.
             </p>
             <ul className="mt-6 space-y-4">
               {[
-                [Video, "Virtual interviews", "Schedule and run interviews without leaving the platform."],
-                [ShieldCheck, "Secure document verification", "Collect and verify onboarding documents with confidence."],
-                [Banknote, "Salaries to the wallet", "Pay your team and let them withdraw on their terms."],
+                [Video, "Virtual interviews", "Schedule and run interviews in secure, in-platform video rooms."],
+                [ShieldCheck, "Secure document verification", "Collect and verify onboarding documents with private, access-controlled storage."],
+                [Banknote, "Salaries to the wallet", "Pay your team directly and let them withdraw on their own terms."],
               ].map(([Icon, t, b]) => (
                 <li key={t as string} className="flex gap-3">
                   <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700">
@@ -193,16 +371,17 @@ export default function LandingPage() {
       </section>
 
       {/* How it works */}
-      <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
+      <section id="how" className="mx-auto max-w-6xl scroll-mt-20 px-4 pb-16 sm:px-6">
         <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">From application to first paycheck</h2>
-          <p className="mt-2 text-slate-600">A guided journey for every new hire.</p>
+          <span className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-brand-600">How it works</span>
+          <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">From application to first paycheck</h2>
+          <p className="mt-2 text-slate-600">A guided journey for every new hire — in three clear stages.</p>
         </div>
         <div className="grid gap-5 sm:grid-cols-3">
           {[
-            { icon: UserPlus, step: "01", title: "Apply & get placed", body: "Create your profile, submit your CV, and get matched to a role by our team." },
-            { icon: GraduationCap, step: "02", title: "Onboard & train", body: "Verify your documents, set up benefits, and complete your onboarding bootcamp." },
-            { icon: ArrowDownToLine, step: "03", title: "Work & get paid", body: "Take on assignments, earn your salary, and withdraw to your preferred method." },
+            { icon: UserPlus, step: "01", title: "Apply & get placed", body: "Create your profile, submit your CV, and get matched to a role by our team through a structured interview." },
+            { icon: GraduationCap, step: "02", title: "Onboard & train", body: "Verify your documents, set up benefits, and complete your onboarding bootcamp to get up to speed." },
+            { icon: ArrowDownToLine, step: "03", title: "Work & get paid", body: "Take on assignments, earn your salary directly to your wallet, and withdraw to your preferred method." },
           ].map((f) => (
             <div key={f.title} className="relative rounded-2xl border border-slate-200/70 bg-white p-6 shadow-card">
               <div className="flex items-center justify-between">
@@ -218,13 +397,65 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Security & trust */}
+      <section id="security" className="scroll-mt-20 border-y border-slate-200/60 bg-white/50">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-brand-600">Security &amp; trust</span>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+              Your people&apos;s data, protected by design
+            </h2>
+            <p className="mt-3 text-slate-600">
+              Security isn&apos;t a feature bolted on at the end — it&apos;s built into how the platform
+              stores documents, controls access, and handles every payment.
+            </p>
+          </div>
+          <div className="mt-10 grid gap-5 sm:grid-cols-2">
+            {SECURITY.map((s) => (
+              <div key={s.title} className="flex gap-4 rounded-2xl border border-slate-200/70 bg-white p-6 shadow-card">
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-gradient text-white shadow-glow">
+                  <s.icon className="h-5 w-5" />
+                </span>
+                <div>
+                  <h3 className="text-base font-semibold text-slate-900">{s.title}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{s.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" className="mx-auto max-w-3xl scroll-mt-20 px-4 py-16 sm:px-6">
+        <div className="mb-8 text-center">
+          <span className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-brand-600">FAQ</span>
+          <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">Questions, answered</h2>
+          <p className="mt-2 text-slate-600">Everything you need to know before you get started.</p>
+        </div>
+        <div className="space-y-3">
+          {FAQ.map((item) => (
+            <details key={item.q} className="group rounded-2xl border border-slate-200/70 bg-white p-5 shadow-card [&_summary]:list-none">
+              <summary className="flex cursor-pointer items-center justify-between gap-4 text-sm font-semibold text-slate-900">
+                {item.q}
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-500 transition-transform group-open:rotate-45">
+                  <span className="text-lg leading-none">+</span>
+                </span>
+              </summary>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">{item.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
         <div className="relative overflow-hidden rounded-3xl bg-hero-mesh px-8 py-14 text-center shadow-elevated sm:px-12">
           <div className="pointer-events-none absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, white 1px, transparent 1px)", backgroundSize: "26px 26px" }} />
           <h2 className="relative text-3xl font-bold tracking-tight text-white sm:text-4xl">Ready to build your team?</h2>
           <p className="relative mx-auto mt-3 max-w-xl text-white/85">
-            Join GTMS today and give your workforce the professional experience they deserve.
+            Join GTMS today and give your workforce the professional experience they deserve —
+            from their first application to every paycheck.
           </p>
           <div className="relative mt-8 flex items-center justify-center gap-3">
             <ButtonLink href="/register" size="lg" variant="secondary" className="gap-2">
@@ -234,10 +465,47 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Footer */}
       <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 sm:flex-row">
-          <BrandLogo />
-          <p className="text-sm text-slate-500">© GTMS — recruiting, employment &amp; payroll.</p>
+        <div className="mx-auto max-w-6xl px-6 py-12">
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="lg:col-span-2">
+              <BrandLogo />
+              <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-500">
+                The workforce &amp; payroll platform that carries every employee securely from
+                application to paycheck — recruiting, onboarding, training, and payroll in one place.
+              </p>
+              <div className="mt-4 flex flex-col gap-1.5 text-sm text-slate-500">
+                <span className="inline-flex items-center gap-2"><Mail className="h-4 w-4 text-slate-400" /> support@gtms.app</span>
+                <span className="inline-flex items-center gap-2"><Globe className="h-4 w-4 text-slate-400" /> Available worldwide</span>
+                <span className="inline-flex items-center gap-2"><Clock className="h-4 w-4 text-slate-400" /> Support Mon–Fri, 9–6</span>
+              </div>
+            </div>
+            {[
+              { h: "Platform", links: [["Modules", "#modules"], ["How it works", "#how"], ["Security", "#security"], ["FAQ", "#faq"]] },
+              { h: "Company", links: [["About", "#about"], ["Careers", "/register"], ["Contact", "mailto:support@gtms.app"]] },
+              { h: "Get started", links: [["Apply now", "/register"], ["Sign in", "/login"]] },
+            ].map((col) => (
+              <div key={col.h}>
+                <p className="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-slate-400">{col.h}</p>
+                <ul className="mt-3 space-y-2 text-sm">
+                  {col.links.map(([label, href]) => (
+                    <li key={label}>
+                      <Link href={href} className="text-slate-600 transition-colors hover:text-brand-700">
+                        {label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-slate-100 pt-6 text-xs text-slate-400 sm:flex-row">
+            <p>© GTMS — recruiting, employment &amp; payroll platform. All rights reserved.</p>
+            <p className="inline-flex items-center gap-4">
+              <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5" /> Enterprise-grade security</span>
+            </p>
+          </div>
         </div>
       </footer>
     </main>

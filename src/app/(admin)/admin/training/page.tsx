@@ -23,7 +23,11 @@ export default async function AdminTrainingPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Bootcamp & training" subtitle="Publish courses and track completion across your team." />
+      <PageHeader
+        eyebrow="Learning & development"
+        title="Bootcamp & training"
+        subtitle="Publish structured courses and modules, assign them to your team, and track completion and certification so every new hire gets productive quickly."
+      />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard label="Courses" value={courses.length} icon={<GraduationCap className="h-5 w-5" />} tone="brand" />

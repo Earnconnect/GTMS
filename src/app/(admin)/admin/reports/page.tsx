@@ -30,7 +30,11 @@ export default async function AdminReportsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Employee reports" subtitle="Review and resolve reports submitted by your team." />
+      <PageHeader
+        eyebrow="Operations"
+        title="Employee reports"
+        subtitle="Stay on top of the progress updates, issues, and incidents your team raises — review each report and resolve it so nothing falls through the cracks."
+      />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard label="Open" value={open} icon={<FileWarning className="h-5 w-5" />} tone="amber" />

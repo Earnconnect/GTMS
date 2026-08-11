@@ -42,7 +42,11 @@ export default async function AdminAssignmentsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Work assignments" subtitle="Assign jobs to employees and review their submitted work." />
+      <PageHeader
+        eyebrow="Work management"
+        title="Work assignments"
+        subtitle="Assign role-matched work to your team, track it from start to submission, review deliverables, and keep the conversation in one place on every assignment."
+      />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard label="Active" value={active} icon={<Briefcase className="h-5 w-5" />} tone="brand" />

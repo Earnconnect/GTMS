@@ -29,8 +29,9 @@ export default async function ReportsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow="Communication"
         title="Reports"
-        subtitle="Submit progress updates, flag issues, or report incidents to the team."
+        subtitle="Keep your team in the loop. Share progress updates, flag anything blocking your work, or report an incident — and follow each report through to resolution."
       />
 
       <div className="grid gap-6 lg:grid-cols-5">

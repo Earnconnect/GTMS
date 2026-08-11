@@ -58,7 +58,11 @@ export default async function AdminAnalyticsPage() {
 
   return (
     <div>
-      <PageHeader title="Analytics" subtitle="Platform money flow and operations." />
+      <PageHeader
+        eyebrow="Insights"
+        title="Analytics"
+        subtitle="Understand how money and work move through your organization — payroll totals, balances, and operational activity across the platform at a glance."
+      />
 
       <h2 className="mb-3 text-lg font-semibold">Money</h2>
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

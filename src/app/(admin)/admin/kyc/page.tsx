@@ -13,7 +13,11 @@ export default async function AdminKycPage() {
 
   return (
     <div>
-      <PageHeader title="KYC review" subtitle="Approve or reject identity verifications." />
+      <PageHeader
+        eyebrow="Compliance"
+        title="Identity verification"
+        subtitle="Review the identity checks employees complete before they can withdraw, approving or returning each one to keep payouts secure and compliant."
+      />
       {pending.length === 0 ? (
         <EmptyState>No pending KYC submissions.</EmptyState>
       ) : (

@@ -25,7 +25,11 @@ export default async function AssignmentsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="My work" subtitle="Jobs assigned to you. Start one, do the work, and submit it for review." />
+      <PageHeader
+        eyebrow="Your work"
+        title="My assignments"
+        subtitle="Everything assigned to you, in one place. Start a task when you're ready, complete the work, submit it for review, and message your manager along the way."
+      />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard label="Active" value={active} icon={<Briefcase className="h-5 w-5" />} tone="brand" />

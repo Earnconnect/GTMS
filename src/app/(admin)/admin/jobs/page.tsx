@@ -29,7 +29,11 @@ export default async function AdminJobsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Job placements" subtitle="Post roles and move applicants through the pipeline." />
+      <PageHeader
+        eyebrow="Recruiting"
+        title="Job placements"
+        subtitle="Publish open roles, review incoming applications and CVs, and move candidates through the pipeline from applied to placed — all from one recruiting workspace."
+      />
 
       <SectionCard title="Create a placement" description="Publish an internal role for your team to apply to.">
         <CreateJobForm />

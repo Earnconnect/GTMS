@@ -29,8 +29,9 @@ export default async function AdminLedgerPage() {
   return (
     <div>
       <PageHeader
-        title="Ledger"
-        subtitle="Double-entry integrity across all wallets."
+        eyebrow="Finance"
+        title="Transaction ledger"
+        subtitle="A complete, audit-ready record of every credit and debit across all wallets, with double-entry integrity checks so your books always reconcile."
         action={
           allOk ? (
             <Badge tone="green">All reconciled</Badge>

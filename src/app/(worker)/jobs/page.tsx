@@ -50,8 +50,9 @@ export default async function JobsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow="Careers"
         title="Job placements"
-        subtitle="Internal roles open to our team. Apply and our recruiters will place you."
+        subtitle="Explore open roles across the organization. Submit your application and our recruiting team will review your profile and place you where you'll thrive."
       />
 
       {myApps.length > 0 && (

@@ -24,7 +24,11 @@ export default async function InterviewsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Interviews" subtitle="Your scheduled and past virtual interviews." />
+      <PageHeader
+        eyebrow="Recruiting"
+        title="Interviews"
+        subtitle="Your upcoming and past interviews, all in one place. Join secure video rooms right here when it's time — no external tools or downloads required."
+      />
 
       {interviews.length === 0 ? (
         <EmptyState icon={<Video className="h-5 w-5" />} title="No interviews scheduled">

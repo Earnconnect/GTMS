@@ -46,8 +46,9 @@ export default async function AdminOverview() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Overview"
-        subtitle="Your team and payroll at a glance."
+        eyebrow="Administration"
+        title="Company overview"
+        subtitle="A real-time snapshot of your workforce and payroll — headcount, salary paid to date, pending withdrawals, and everyone still awaiting onboarding, all in one place."
         action={
           <ButtonLink href="/admin/employees" className="gap-2">
             <UserPlus className="h-4 w-4" /> Onboard employee

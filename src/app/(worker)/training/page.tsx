@@ -29,8 +29,9 @@ export default async function TrainingPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow="Learning & development"
         title="Bootcamp & training"
-        subtitle="Build the skills for your role. Complete courses to strengthen your profile."
+        subtitle="Grow into your role with structured courses built for our team. Work through the modules at your own pace, track your progress, and earn certificates that strengthen your profile."
       />
 
       <div className="grid gap-4 sm:grid-cols-3">

@@ -15,7 +15,11 @@ export default async function AdminUsersPage() {
 
   return (
     <div>
-      <PageHeader title="Users" subtitle="Manage roles and account status." />
+      <PageHeader
+        eyebrow="Administration"
+        title="User management"
+        subtitle="Manage everyone with access to the platform — assign roles, activate or suspend accounts, and keep permissions aligned with each person's responsibilities."
+      />
       <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
         <table className="w-full text-sm">
           <thead className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase text-slate-500">
